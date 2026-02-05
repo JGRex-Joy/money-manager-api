@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Builder
 public class CategoryDTO {
     private Long id;
-    private String profile_id;
+    private Long profile_id;
     private String name;
     private String icon;
     private String type;

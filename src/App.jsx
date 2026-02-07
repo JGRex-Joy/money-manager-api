@@ -1,4 +1,4 @@
-import {BrowserRouter, Routes, Route} from "react-router-dom";
+import {BrowserRouter, Routes, Route, Navigate} from "react-router-dom";
 import Expense from "./pages/Expense.jsx";
 import Category from "./pages/Category.jsx";
 import Filter from "./pages/Filter.jsx";
@@ -6,6 +6,7 @@ import Signup from "./pages/Signup.jsx";
 import Home from "./pages/Home.jsx";
 import Income from "./pages/Income.jsx";
 import Login from "./pages/Login.jsx";
+import Toaster from "./components/Toaster.jsx";
 
 const App = () => {
     return (
@@ -13,6 +14,7 @@ const App = () => {
             <Toaster />
             <BrowserRouter>
                 <Routes>
+                    <Route path="/" element={<Navigate to="/dashboard" replace />} />
                     <Route path="/dashboard" element={<Home />} />
                     <Route path="/income" element={<Income />} />
                     <Route path="/expense" element={<Expense />} />

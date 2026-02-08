@@ -53,10 +53,10 @@ const Sidebar = () => {
             {/* User Profile */}
             <div className="p-6 border-b border-gray-200">
                 <div className="flex flex-col">
-                    <p className="text-sm font-semibold text-gray-800 truncate">
+                    <p className="text-sm font-bold text-gray-900 truncate">
                         {user.fullName || 'User'}
                     </p>
-                    <p className="text-xs text-gray-500 truncate mt-1">{user.email}</p>
+                    <p className="text-xs text-gray-600 truncate mt-1">{user.email}</p>
                 </div>
             </div>
 

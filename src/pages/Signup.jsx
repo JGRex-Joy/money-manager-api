@@ -25,12 +25,12 @@ const Signup = () => {
         e.preventDefault();
 
         if (formData.password !== formData.confirmPassword) {
-            toast.error('Пароли не совпадают');
+            toast.error("The passwords don't match");
             return;
         }
 
         if (formData.password.length < 6) {
-            toast.error('Пароль должен содержать минимум 6 символов');
+            toast.error('The password must contain at least 6 characters');
             return;
         }
 
@@ -43,10 +43,10 @@ const Signup = () => {
                 password: formData.password,
             });
 
-            toast.success('Регистрация успешна! Проверьте email для активации аккаунта.');
+            toast.success('Registration successful! Check your email to activate your account');
             setTimeout(() => navigate('/login'), 2000);
         } catch (error) {
-            const errorMessage = error.response?.data?.message || 'Ошибка регистрации. Попробуйте снова.';
+            const errorMessage = error.response?.data?.message || 'Registration error. Please try again';
             toast.error(errorMessage);
         } finally {
             setLoading(false);
@@ -61,14 +61,14 @@ const Signup = () => {
                         <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-600 rounded-xl flex items-center justify-center mx-auto mb-4">
                             <UserPlus className="text-white" size={32} />
                         </div>
-                        <h1 className="text-3xl font-bold text-gray-800">Регистрация</h1>
-                        <p className="text-gray-500 mt-2">Создайте аккаунт Money Manager</p>
+                        <h1 className="text-3xl font-bold text-gray-800">Sign Up</h1>
+                        <p className="text-gray-500 mt-2">Create a Money Manager account</p>
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-5">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Полное имя
+                                Full name
                             </label>
                             <div className="relative">
                                 <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
@@ -79,7 +79,7 @@ const Signup = () => {
                                     onChange={handleChange}
                                     required
                                     className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
-                                    placeholder="Иван Иванов"
+                                    placeholder="Amir Omurqul"
                                 />
                             </div>
                         </div>
@@ -104,7 +104,7 @@ const Signup = () => {
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Пароль
+                                Password
                             </label>
                             <div className="relative">
                                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
@@ -122,7 +122,7 @@ const Signup = () => {
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Подтвердите пароль
+                                Confirm password
                             </label>
                             <div className="relative">
                                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
@@ -143,15 +143,15 @@ const Signup = () => {
                             disabled={loading}
                             className="w-full bg-gradient-to-r from-purple-500 to-blue-600 text-white py-3 rounded-lg font-semibold hover:from-purple-600 hover:to-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            {loading ? 'Регистрация...' : 'Зарегистрироваться'}
+                            {loading ? 'Registration...' : 'Sign Up'}
                         </button>
                     </form>
 
                     <div className="mt-6 text-center">
                         <p className="text-gray-600">
-                            Уже есть аккаунт?{' '}
+                            Already have an account?{' '}
                             <Link to="/login" className="text-purple-600 hover:text-purple-700 font-semibold">
-                                Войти
+                                Log in
                             </Link>
                         </p>
                     </div>

@@ -27,7 +27,7 @@ const Category = () => {
             const response = await api.get('/categories');
             setCategories(response.data);
         } catch (error) {
-            toast.error('Ошибка загрузки категорий');
+            toast.error('Expense loading error');
         } finally {
             setLoading(false);
         }
@@ -38,15 +38,15 @@ const Category = () => {
         try {
             if (editMode && currentCategory) {
                 await api.put(`/categories/${currentCategory.id}`, formData);
-                toast.success('Категория обновлена');
+                toast.success('Category updated');
             } else {
                 await api.post('/categories', formData);
-                toast.success('Категория успешно создана');
+                toast.success('Category created successfully');
             }
             closeModal();
             fetchCategories();
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Ошибка сохранения категории');
+            toast.error(error.response?.data?.message || 'Category saving failed');
         }
     };
 
@@ -81,15 +81,16 @@ const Category = () => {
                 {/* Header */}
                 <div className="flex justify-between items-center">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-800">Категории</h1>
-                        <p className="text-gray-500 mt-1">Управление категориями доходов и расходов</p>
+                        <h1 className="text-3xl font-bold text-gray-800">Categories</h1>
+                        <p className="text-gray-500 mt-1">
+                            Management of income and expense categories</p>
                     </div>
                     <button
                         onClick={() => setShowModal(true)}
                         className="flex items-center space-x-2 bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition"
                     >
                         <Plus size={20} />
-                        <span>Создать категорию</span>
+                        <span>Create category</span>
                     </button>
                 </div>
 
@@ -101,7 +102,7 @@ const Category = () => {
                             <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
                                 <FolderOpen className="text-green-600" size={18} />
                             </div>
-                            <span>Категории доходов</span>
+                            <span>Income categories</span>
                             <span className="text-sm text-gray-500">({incomeCategories.length})</span>
                         </h2>
                         {loading ? (
@@ -133,7 +134,7 @@ const Category = () => {
                             </div>
                         ) : (
                             <div className="text-center py-8 text-gray-500">
-                                Нет категорий доходов
+                                Income category not found
                             </div>
                         )}
                     </div>
@@ -144,7 +145,7 @@ const Category = () => {
                             <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
                                 <FolderOpen className="text-red-600" size={18} />
                             </div>
-                            <span>Категории расходов</span>
+                            <span>Expense categories</span>
                             <span className="text-sm text-gray-500">({expenseCategories.length})</span>
                         </h2>
                         {loading ? (
@@ -176,7 +177,7 @@ const Category = () => {
                             </div>
                         ) : (
                             <div className="text-center py-8 text-gray-500">
-                                Нет категорий расходов
+                                Expense categories not found
                             </div>
                         )}
                     </div>
@@ -189,7 +190,7 @@ const Category = () => {
                     <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-2xl font-bold text-gray-800">
-                                {editMode ? 'Редактировать категорию' : 'Создать категорию'}
+                                {editMode ? 'Edit category' : 'Create category'}
                             </h2>
                             <button
                                 onClick={closeModal}
@@ -202,7 +203,7 @@ const Category = () => {
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Название
+                                    Name
                                 </label>
                                 <input
                                     type="text"
@@ -210,13 +211,13 @@ const Category = () => {
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                     required
                                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                                    placeholder="Название категории"
+                                    placeholder="Category name"
                                 />
                             </div>
 
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Иконка
+                                    Icon
                                 </label>
                                 <div className="relative">
                                     <button
@@ -225,7 +226,7 @@ const Category = () => {
                                         className="w-full px-4 py-3 border border-gray-300 rounded-lg text-left flex items-center space-x-2"
                                     >
                                         <span className="text-3xl">{formData.icon}</span>
-                                        <span className="text-gray-500">Выбрать иконку</span>
+                                        <span className="text-gray-500">Choose icon</span>
                                     </button>
                                     {showEmojiPicker && (
                                         <div className="absolute z-10 mt-2">
@@ -242,7 +243,7 @@ const Category = () => {
 
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Тип категории
+                                    Category type
                                 </label>
                                 <div className="grid grid-cols-2 gap-3">
                                     <button
@@ -265,7 +266,7 @@ const Category = () => {
                                                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                                         }`}
                                     >
-                                        Расход
+                                        Expense
                                     </button>
                                 </div>
                             </div>
@@ -274,7 +275,7 @@ const Category = () => {
                                 type="submit"
                                 className="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition"
                             >
-                                {editMode ? 'Обновить категорию' : 'Создать категорию'}
+                                {editMode ? 'Update category' : 'Create category'}
                             </button>
                         </form>
                     </div>

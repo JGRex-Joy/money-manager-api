@@ -308,6 +308,7 @@ const Home = () => {
                 <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
                     <div className="flex items-center justify-between mb-4">
                         <h2 className="text-xl font-bold text-gray-800">Recent Transactions</h2>
+                        <h2 className="text-xl font-bold text-gray-800">Recent Transactions</h2>
                         <Activity className="text-gray-400" size={24} />
                     </div>
                     <div className="overflow-x-auto">

@@ -29,11 +29,11 @@ const Login = () => {
             if (response.data.token) {
                 localStorage.setItem('token', response.data.token);
                 localStorage.setItem('user', JSON.stringify(response.data.user));
-                toast.success('Вход выполнен успешно!');
+                toast.success('Login successful!');
                 navigate('/dashboard');
             }
         } catch (error) {
-            const errorMessage = error.response?.data?.message || 'Ошибка входа. Проверьте учетные данные.';
+            const errorMessage = error.response?.data?.message || 'Login error. Check your credentials';
             toast.error(errorMessage);
         } finally {
             setLoading(false);
@@ -48,8 +48,8 @@ const Login = () => {
                         <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center mx-auto mb-4">
                             <LogIn className="text-white" size={32} />
                         </div>
-                        <h1 className="text-3xl font-bold text-gray-800">Вход</h1>
-                        <p className="text-gray-500 mt-2">Войдите в свой аккаунт Money Manager</p>
+                        <h1 className="text-3xl font-bold text-gray-800">Log in</h1>
+                        <p className="text-gray-500 mt-2">Log in to your Money Manager account</p>
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-6">
@@ -73,7 +73,7 @@ const Login = () => {
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Пароль
+                                Password
                             </label>
                             <div className="relative">
                                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
@@ -94,15 +94,15 @@ const Login = () => {
                             disabled={loading}
                             className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-blue-600 hover:to-purple-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            {loading ? 'Вход...' : 'Войти'}
+                            {loading ? 'Login...' : 'Login'}
                         </button>
                     </form>
 
                     <div className="mt-6 text-center">
                         <p className="text-gray-600">
-                            Нет аккаунта?{' '}
+                            Don't have an account?{' '}
                             <Link to="/signup" className="text-blue-600 hover:text-blue-700 font-semibold">
-                                Зарегистрироваться
+                                Sign Up
                             </Link>
                         </p>
                     </div>

@@ -107,7 +107,7 @@ const Sidebar = () => {
         <>
             {/* Desktop Sidebar */}
             <div className="hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0 bg-white border-r border-gray-200 z-50">
-                <SidebarContent />
+                {SidebarContent()}
             </div>
 
             {/* Mobile Header */}
@@ -134,7 +134,7 @@ const Sidebar = () => {
             {isMobileMenuOpen && (
                 <div className="lg:hidden fixed inset-0 z-40 bg-black bg-opacity-50" onClick={() => setIsMobileMenuOpen(false)}>
                     <div className="fixed inset-y-0 left-0 w-64 bg-white shadow-xl flex flex-col" onClick={(e) => e.stopPropagation()}>
-                        <SidebarContent />
+                        {SidebarContent()}
                     </div>
                 </div>
             )}

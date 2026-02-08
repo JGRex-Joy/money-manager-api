@@ -30,7 +30,7 @@ const Expense = () => {
             const response = await api.get('/expenses');
             setExpenses(response.data);
         } catch (error) {
-            toast.error('Ошибка загрузки расходов');
+            toast.error('Expense loading error');
         } finally {
             setLoading(false);
         }
@@ -41,7 +41,7 @@ const Expense = () => {
             const response = await api.get('/categories/expense');
             setCategories(response.data);
         } catch (error) {
-            toast.error('Ошибка загрузки категорий');
+            toast.error('Categories loading error');
         }
     };
 
@@ -52,7 +52,7 @@ const Expense = () => {
                 ...formData,
                 amount: parseFloat(formData.amount),
             });
-            toast.success('Расход успешно добавлен');
+            toast.success('Expense added successfully');
             setShowModal(false);
             setFormData({
                 name: '',
@@ -63,18 +63,18 @@ const Expense = () => {
             });
             fetchExpenses();
         } catch (error) {
-            toast.error('Ошибка добавления расхода');
+            toast.error('Expense adding error');
         }
     };
 
     const handleDelete = async (id) => {
-        if (confirm('Удалить этот расход?')) {
+        if (confirm('Delete thos expense?')) {
             try {
                 await api.delete(`/expenses/${id}`);
-                toast.success('Расход удален');
+                toast.success('Expense deleted');
                 fetchExpenses();
             } catch (error) {
-                toast.error('Ошибка удаления расхода');
+                toast.error('Expense delete error');
             }
         }
     };
@@ -87,28 +87,28 @@ const Expense = () => {
                 {/* Header */}
                 <div className="flex justify-between items-center">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-800">Расходы</h1>
-                        <p className="text-gray-500 mt-1">Управление вашими расходами</p>
+                        <h1 className="text-3xl font-bold text-gray-800">Expenses</h1>
+                        <p className="text-gray-500 mt-1">Managing your expenses</p>
                     </div>
                     <button
                         onClick={() => setShowModal(true)}
                         className="flex items-center space-x-2 bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition"
                     >
                         <Plus size={20} />
-                        <span>Добавить расход</span>
+                        <span>Add expense</span>
                     </button>
                 </div>
 
                 {/* Total Expense Card */}
                 <div className="bg-gradient-to-r from-red-500 to-pink-600 rounded-xl shadow-lg p-6 text-white">
-                    <p className="text-red-100 text-sm font-medium">Всего расходов в этом месяце</p>
+                    <p className="text-red-100 text-sm font-medium">Total expenses this month</p>
                     <p className="text-4xl font-bold mt-2">{formatCurrency(totalExpense)}</p>
                 </div>
 
                 {/* Expenses List */}
                 <div className="bg-white rounded-xl shadow-md border border-gray-100">
                     <div className="p-6">
-                        <h2 className="text-xl font-bold text-gray-800 mb-4">Список расходов</h2>
+                        <h2 className="text-xl font-bold text-gray-800 mb-4">List of expenses</h2>
                         {loading ? (
                             <div className="flex justify-center py-8">
                                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"></div>
@@ -118,11 +118,11 @@ const Expense = () => {
                                 <table className="w-full">
                                     <thead>
                                     <tr className="border-b border-gray-200">
-                                        <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">Название</th>
-                                        <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">Категория</th>
-                                        <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">Дата</th>
-                                        <th className="text-right py-3 px-4 text-sm font-semibold text-gray-600">Сумма</th>
-                                        <th className="text-center py-3 px-4 text-sm font-semibold text-gray-600">Действия</th>
+                                        <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">Name</th>
+                                        <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">Category</th>
+                                        <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">Date</th>
+                                        <th className="text-right py-3 px-4 text-sm font-semibold text-gray-600">Amount</th>
+                                        <th className="text-center py-3 px-4 text-sm font-semibold text-gray-600">Action</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -154,7 +154,7 @@ const Expense = () => {
                             </div>
                         ) : (
                             <div className="text-center py-12">
-                                <p className="text-gray-500">Нет расходов за этот месяц</p>
+                                    <p className="text-gray-500">No expenses for this month</p>
                             </div>
                         )}
                     </div>
@@ -166,7 +166,7 @@ const Expense = () => {
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
                     <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
                         <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-2xl font-bold text-gray-800">Добавить расход</h2>
+                            <h2 className="text-2xl font-bold text-gray-800">Add expense</h2>
                             <button
                                 onClick={() => setShowModal(false)}
                                 className="text-gray-400 hover:text-gray-600"
@@ -178,7 +178,7 @@ const Expense = () => {
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Название
+                                    Name
                                 </label>
                                 <input
                                     type="text"
@@ -192,7 +192,7 @@ const Expense = () => {
 
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Иконка
+                                    Icon
                                 </label>
                                 <div className="relative">
                                     <button
@@ -201,7 +201,7 @@ const Expense = () => {
                                         className="w-full px-4 py-3 border border-gray-300 rounded-lg text-left flex items-center space-x-2"
                                     >
                                         <span className="text-2xl">{formData.icon}</span>
-                                        <span className="text-gray-500">Выбрать иконку</span>
+                                        <span className="text-gray-500">Choose icon</span>
                                     </button>
                                     {showEmojiPicker && (
                                         <div className="absolute z-10 mt-2">
@@ -218,7 +218,7 @@ const Expense = () => {
 
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Категория
+                                    Category
                                 </label>
                                 <select
                                     value={formData.categoryId}
@@ -226,7 +226,7 @@ const Expense = () => {
                                     required
                                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                                 >
-                                    <option value="">Выберите категорию</option>
+                                    <option value="">Choose category</option>
                                     {categories.map((cat) => (
                                         <option key={cat.id} value={cat.id}>
                                             {cat.icon} {cat.name}
@@ -237,7 +237,7 @@ const Expense = () => {
 
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Сумма
+                                    Amount
                                 </label>
                                 <input
                                     type="number"
@@ -252,7 +252,7 @@ const Expense = () => {
 
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Дата
+                                    Date
                                 </label>
                                 <input
                                     type="date"
@@ -267,7 +267,7 @@ const Expense = () => {
                                 type="submit"
                                 className="w-full bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition"
                             >
-                                Добавить расход
+                                Add expense
                             </button>
                         </form>
                     </div>

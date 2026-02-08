@@ -26,9 +26,9 @@ const Filter = () => {
         try {
             const response = await api.post('/filter', filterData);
             setResults(response.data);
-            toast.success(`Найдено ${response.data.length} результатов`);
+            toast.success(`Found ${response.data.length} results`);
         } catch (error) {
-            toast.error('Ошибка поиска');
+            toast.error('Search failed');
             setResults([]);
         } finally {
             setLoading(false);
@@ -42,8 +42,8 @@ const Filter = () => {
             <div className="space-y-6">
                 {/* Header */}
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-800">Фильтр транзакций</h1>
-                    <p className="text-gray-500 mt-1">Поиск и фильтрация доходов и расходов</p>
+                    <h1 className="text-3xl font-bold text-gray-800">Transaction filter</h1>
+                    <p className="text-gray-500 mt-1">Search and filter income and expenses</p>
                 </div>
 
                 {/* Filter Form */}
@@ -52,7 +52,7 @@ const Filter = () => {
                         {/* Type Selection */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-3">
-                                Тип транзакции
+                                Transaction type
                             </label>
                             <div className="grid grid-cols-2 gap-3">
                                 <button
@@ -75,7 +75,7 @@ const Filter = () => {
                                             : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                                     }`}
                                 >
-                                    Расходы
+                                    Expenses
                                 </button>
                             </div>
                         </div>
@@ -84,7 +84,7 @@ const Filter = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Дата начала
+                                    Start date
                                 </label>
                                 <div className="relative">
                                     <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
@@ -98,7 +98,7 @@ const Filter = () => {
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Дата окончания
+                                    End date
                                 </label>
                                 <div className="relative">
                                     <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
@@ -115,7 +115,7 @@ const Filter = () => {
                         {/* Keyword Search */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Поиск по названию
+                                Search by name
                             </label>
                             <div className="relative">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
@@ -123,7 +123,7 @@ const Filter = () => {
                                     type="text"
                                     value={filterData.keyword}
                                     onChange={(e) => setFilterData({ ...filterData, keyword: e.target.value })}
-                                    placeholder="Введите название..."
+                                    placeholder="Input name..."
                                     className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 />
                             </div>
@@ -133,16 +133,16 @@ const Filter = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Сортировать по
+                                    Sort by
                                 </label>
                                 <select
                                     value={filterData.sortField}
                                     onChange={(e) => setFilterData({ ...filterData, sortField: e.target.value })}
                                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 >
-                                    <option value="date">Дате</option>
-                                    <option value="amount">Сумме</option>
-                                    <option value="name">Названию</option>
+                                    <option value="date">Date</option>
+                                    <option value="amount">Amount</option>
+                                    <option value="name">Name</option>
                                 </select>
                             </div>
                             <div>
@@ -196,7 +196,7 @@ const Filter = () => {
                         <div className="p-6">
                             <div className="flex justify-between items-center mb-4">
                                 <h2 className="text-xl font-bold text-gray-800">
-                                    Результаты поиска ({results.length})
+                                    Search results ({results.length})
                                 </h2>
                                 {results.length > 0 && (
                                     <div className={`text-xl font-bold ${
@@ -216,10 +216,10 @@ const Filter = () => {
                                     <table className="w-full">
                                         <thead>
                                         <tr className="border-b border-gray-200">
-                                            <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">Название</th>
-                                            <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">Категория</th>
-                                            <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">Дата</th>
-                                            <th className="text-right py-3 px-4 text-sm font-semibold text-gray-600">Сумма</th>
+                                            <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">Name</th>
+                                            <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">Category</th>
+                                            <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">Dare</th>
+                                            <th className="text-right py-3 px-4 text-sm font-semibold text-gray-600">Amount</th>
                                         </tr>
                                         </thead>
                                         <tbody>
@@ -245,8 +245,8 @@ const Filter = () => {
                                 </div>
                             ) : (
                                 <div className="text-center py-12">
-                                    <p className="text-gray-500 text-lg">Нет результатов по вашему запросу</p>
-                                    <p className="text-gray-400 text-sm mt-2">Попробуйте изменить параметры фильтра</p>
+                                    <p className="text-gray-500 text-lg">There are no results for your request</p>
+                                    <p className="text-gray-400 text-sm mt-2">Try changing filter settings</p>
                                 </div>
                             )}
                         </div>

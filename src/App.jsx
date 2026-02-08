@@ -13,7 +13,6 @@ const App = () => {
     return (
         <>
             <Toaster />
-            <DebugPanel />
             <BrowserRouter>
                 <Routes>
                     <Route path="/" element={<Hero />} />

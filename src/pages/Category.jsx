@@ -104,15 +104,15 @@ const Category = () => {
         <Layout>
             <div className="space-y-6">
                 {/* Header */}
-                <div className="flex justify-between items-center">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-800">Categories</h1>
-                        <p className="text-gray-500 mt-1">
+                        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Categories</h1>
+                        <p className="text-gray-500 mt-1 text-sm sm:text-base">
                             Management of income and expense categories</p>
                     </div>
                     <button
                         onClick={() => setShowModal(true)}
-                        className="flex items-center space-x-2 bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition"
+                        className="flex items-center justify-center space-x-2 bg-purple-600 text-white px-4 sm:px-6 py-3 rounded-lg hover:bg-purple-700 transition shadow-lg"
                     >
                         <Plus size={20} />
                         <span>Create category</span>
@@ -120,10 +120,10 @@ const Category = () => {
                 </div>
 
                 {/* Categories Grid */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                     {/* Income Categories */}
-                    <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6">
-                        <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center space-x-2">
+                    <div className="bg-white rounded-xl shadow-md border border-gray-100 p-4 sm:p-6">
+                        <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-4 flex items-center space-x-2">
                             <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
                                 <FolderOpen className="text-green-600" size={18} />
                             </div>
@@ -139,39 +139,39 @@ const Category = () => {
                                 {incomeCategories.map((category) => (
                                     <div
                                         key={category.id}
-                                        className="flex items-center justify-between p-4 bg-green-50 rounded-lg hover:bg-green-100 transition"
+                                        className="flex items-center justify-between p-3 sm:p-4 bg-green-50 rounded-lg hover:bg-green-100 transition"
                                     >
-                                        <div className="flex items-center space-x-3">
-                                            <span className="text-3xl">{category.icon}</span>
-                                            <p className="font-semibold text-gray-800">{category.name}</p>
+                                        <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
+                                            <span className="text-2xl sm:text-3xl flex-shrink-0">{category.icon}</span>
+                                            <p className="font-semibold text-gray-800 text-sm sm:text-base truncate">{category.name}</p>
                                         </div>
-                                        <div className="flex items-center space-x-2">
+                                        <div className="flex items-center space-x-1 sm:space-x-2 flex-shrink-0">
                                             <button
                                                 onClick={() => openEditModal(category)}
                                                 className="p-2 text-green-600 hover:bg-green-200 rounded-lg transition"
                                             >
-                                                <Edit2 size={18} />
+                                                <Edit2 size={16} className="sm:w-[18px] sm:h-[18px]" />
                                             </button>
                                             <button
                                                 onClick={() => handleDeleteClick(category)}
                                                 className="p-2 text-red-600 hover:bg-red-200 rounded-lg transition"
                                             >
-                                                <Trash2 size={18} />
+                                                <Trash2 size={16} className="sm:w-[18px] sm:h-[18px]" />
                                             </button>
                                         </div>
                                     </div>
                                 ))}
                             </div>
                         ) : (
-                            <div className="text-center py-8 text-gray-500">
+                            <div className="text-center py-8 text-gray-500 text-sm">
                                 Income category not found
                             </div>
                         )}
                     </div>
 
                     {/* Expense Categories */}
-                    <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6">
-                        <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center space-x-2">
+                    <div className="bg-white rounded-xl shadow-md border border-gray-100 p-4 sm:p-6">
+                        <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-4 flex items-center space-x-2">
                             <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
                                 <FolderOpen className="text-red-600" size={18} />
                             </div>
@@ -187,31 +187,31 @@ const Category = () => {
                                 {expenseCategories.map((category) => (
                                     <div
                                         key={category.id}
-                                        className="flex items-center justify-between p-4 bg-red-50 rounded-lg hover:bg-red-100 transition"
+                                        className="flex items-center justify-between p-3 sm:p-4 bg-red-50 rounded-lg hover:bg-red-100 transition"
                                     >
-                                        <div className="flex items-center space-x-3">
-                                            <span className="text-3xl">{category.icon}</span>
-                                            <p className="font-semibold text-gray-800">{category.name}</p>
+                                        <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
+                                            <span className="text-2xl sm:text-3xl flex-shrink-0">{category.icon}</span>
+                                            <p className="font-semibold text-gray-800 text-sm sm:text-base truncate">{category.name}</p>
                                         </div>
-                                        <div className="flex items-center space-x-2">
+                                        <div className="flex items-center space-x-1 sm:space-x-2 flex-shrink-0">
                                             <button
                                                 onClick={() => openEditModal(category)}
                                                 className="p-2 text-red-600 hover:bg-red-200 rounded-lg transition"
                                             >
-                                                <Edit2 size={18} />
+                                                <Edit2 size={16} className="sm:w-[18px] sm:h-[18px]" />
                                             </button>
                                             <button
                                                 onClick={() => handleDeleteClick(category)}
                                                 className="p-2 text-red-600 hover:bg-red-200 rounded-lg transition"
                                             >
-                                                <Trash2 size={18} />
+                                                <Trash2 size={16} className="sm:w-[18px] sm:h-[18px]" />
                                             </button>
                                         </div>
                                     </div>
                                 ))}
                             </div>
                         ) : (
-                            <div className="text-center py-8 text-gray-500">
+                            <div className="text-center py-8 text-gray-500 text-sm">
                                 Expense categories not found
                             </div>
                         )}
@@ -221,50 +221,50 @@ const Category = () => {
 
             {/* Delete Warning Modal */}
             {showDeleteWarning && categoryToDelete && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+                <div className="fixed inset-0 bg-gradient-to-br from-red-900/20 via-purple-900/20 to-blue-900/20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-4 sm:p-6 animate-scale-in">
                         <div className="flex items-center space-x-3 mb-4">
-                            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                                <AlertTriangle className="text-red-600" size={24} />
+                            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-red-100 rounded-full flex items-center justify-center">
+                                <AlertTriangle className="text-red-600" size={20} />
                             </div>
-                            <h2 className="text-2xl font-bold text-gray-800">Warning!</h2>
+                            <h2 className="text-xl sm:text-2xl font-bold text-gray-800">Warning!</h2>
                         </div>
 
-                        <div className="space-y-4">
-                            <p className="text-gray-700">
+                        <div className="space-y-3 sm:space-y-4">
+                            <p className="text-gray-700 text-sm sm:text-base">
                                 You are about to delete the category{' '}
                                 <span className="font-bold">"{categoryToDelete.name}"</span>
                             </p>
 
-                            <div className="bg-red-50 border-l-4 border-red-600 p-4 rounded">
-                                <p className="text-red-800 font-semibold mb-2">
+                            <div className="bg-red-50 border-l-4 border-red-600 p-3 sm:p-4 rounded">
+                                <p className="text-red-800 font-semibold mb-2 text-sm sm:text-base">
                                     ⚠️ This will permanently delete:
                                 </p>
-                                <ul className="text-red-700 space-y-1 ml-4">
+                                <ul className="text-red-700 space-y-1 ml-4 text-xs sm:text-sm">
                                     <li>• The category itself</li>
                                     <li>• ALL {categoryToDelete.type === 'income' ? 'income' : 'expense'} records using this category</li>
                                     <li className="font-bold mt-2">• This action CANNOT be undone!</li>
                                 </ul>
                             </div>
 
-                            <p className="text-gray-600 text-sm">
+                            <p className="text-gray-600 text-xs sm:text-sm">
                                 Are you absolutely sure you want to continue?
                             </p>
                         </div>
 
-                        <div className="flex space-x-3 mt-6">
+                        <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 mt-4 sm:mt-6">
                             <button
                                 onClick={() => {
                                     setShowDeleteWarning(false);
                                     setCategoryToDelete(null);
                                 }}
-                                className="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-300 transition"
+                                className="flex-1 bg-gray-200 text-gray-700 py-2.5 sm:py-3 rounded-lg font-semibold hover:bg-gray-300 transition text-sm sm:text-base"
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={confirmDelete}
-                                className="flex-1 bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition"
+                                className="flex-1 bg-red-600 text-white py-2.5 sm:py-3 rounded-lg font-semibold hover:bg-red-700 transition text-sm sm:text-base"
                             >
                                 Yes, Delete Everything
                             </button>
@@ -275,21 +275,21 @@ const Category = () => {
 
             {/* Category Modal */}
             {showModal && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
-                        <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-2xl font-bold text-gray-800">
+                <div className="fixed inset-0 bg-gradient-to-br from-purple-900/20 via-blue-900/20 to-pink-900/20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-4 sm:p-6 max-h-[90vh] overflow-y-auto animate-scale-in">
+                        <div className="flex justify-between items-center mb-4 sm:mb-6">
+                            <h2 className="text-xl sm:text-2xl font-bold text-gray-800">
                                 {editMode ? 'Edit category' : 'Create category'}
                             </h2>
                             <button
                                 onClick={closeModal}
-                                className="text-gray-400 hover:text-gray-600"
+                                className="text-gray-400 hover:text-gray-600 p-1"
                             >
                                 <X size={24} />
                             </button>
                         </div>
 
-                        <form onSubmit={handleSubmit} className="space-y-4">
+                        <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     Name
@@ -299,7 +299,7 @@ const Category = () => {
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                     required
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm sm:text-base"
                                     placeholder="Category name"
                                 />
                             </div>
@@ -312,18 +312,19 @@ const Category = () => {
                                     <button
                                         type="button"
                                         onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg text-left flex items-center space-x-2"
+                                        className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg text-left flex items-center space-x-2"
                                     >
-                                        <span className="text-3xl">{formData.icon}</span>
-                                        <span className="text-gray-500">Choose icon</span>
+                                        <span className="text-2xl sm:text-3xl">{formData.icon}</span>
+                                        <span className="text-gray-500 text-sm sm:text-base">Choose icon</span>
                                     </button>
                                     {showEmojiPicker && (
-                                        <div className="absolute z-10 mt-2">
+                                        <div className="absolute z-10 mt-2 left-0 right-0">
                                             <EmojiPicker
                                                 onEmojiClick={(emojiData) => {
                                                     setFormData({ ...formData, icon: emojiData.emoji });
                                                     setShowEmojiPicker(false);
                                                 }}
+                                                width="100%"
                                             />
                                         </div>
                                     )}
@@ -334,11 +335,11 @@ const Category = () => {
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     Category type
                                 </label>
-                                <div className="grid grid-cols-2 gap-3">
+                                <div className="grid grid-cols-2 gap-2 sm:gap-3">
                                     <button
                                         type="button"
                                         onClick={() => setFormData({ ...formData, type: 'income' })}
-                                        className={`py-3 px-4 rounded-lg font-medium transition ${
+                                        className={`py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg font-medium transition text-sm sm:text-base ${
                                             formData.type === 'income'
                                                 ? 'bg-green-600 text-white'
                                                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -349,7 +350,7 @@ const Category = () => {
                                     <button
                                         type="button"
                                         onClick={() => setFormData({ ...formData, type: 'expense' })}
-                                        className={`py-3 px-4 rounded-lg font-medium transition ${
+                                        className={`py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg font-medium transition text-sm sm:text-base ${
                                             formData.type === 'expense'
                                                 ? 'bg-red-600 text-white'
                                                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -362,7 +363,7 @@ const Category = () => {
 
                             <button
                                 type="submit"
-                                className="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition"
+                                className="w-full bg-purple-600 text-white py-2.5 sm:py-3 rounded-lg font-semibold hover:bg-purple-700 transition text-sm sm:text-base mt-4"
                             >
                                 {editMode ? 'Update category' : 'Create category'}
                             </button>

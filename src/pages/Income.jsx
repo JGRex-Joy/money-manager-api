@@ -5,6 +5,7 @@ import { formatCurrency, formatDate } from '../utils/formatters';
 import { toast } from '../components/Toaster';
 import { Plus, Trash2, X } from 'lucide-react';
 import EmojiPicker from 'emoji-picker-react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const Income = () => {
     const [incomes, setIncomes] = useState([]);
@@ -79,7 +80,53 @@ const Income = () => {
         }
     };
 
+    const closeModal = () => {
+        setShowModal(false);
+        setShowEmojiPicker(false);
+        setFormData({
+            name: '',
+            icon: '💰',
+            categoryId: '',
+            amount: '',
+            date: new Date().toISOString().split('T')[0],
+        });
+    };
+
     const totalIncome = incomes.reduce((sum, income) => sum + Number(income.amount), 0);
+
+    // Prepare chart data
+    const getChartData = () => {
+        const sortedIncomes = [...incomes].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+        return sortedIncomes.map(income => ({
+            date: new Date(income.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+            fullDate: formatDate(income.date),
+            amount: Number(income.amount),
+            name: income.name,
+            category: income.categoryName,
+            icon: income.icon
+        }));
+    };
+
+    const CustomTooltip = ({ active, payload }) => {
+        if (active && payload && payload.length) {
+            const data = payload[0].payload;
+            return (
+                <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-4">
+                    <p className="font-semibold text-gray-800 flex items-center space-x-2">
+                        <span className="text-2xl">{data.icon}</span>
+                        <span>{data.name}</span>
+                    </p>
+                    <p className="text-sm text-gray-600 mt-1">Category: {data.category}</p>
+                    <p className="text-sm text-gray-600">Date: {data.fullDate}</p>
+                    <p className="text-lg font-bold text-green-600 mt-2">{formatCurrency(data.amount)}</p>
+                </div>
+            );
+        }
+        return null;
+    };
+
+    const chartData = getChartData();
 
     return (
         <Layout>
@@ -104,6 +151,29 @@ const Income = () => {
                     <p className="text-green-100 text-sm font-medium">Total income this month</p>
                     <p className="text-4xl font-bold mt-2">{formatCurrency(totalIncome)}</p>
                 </div>
+
+                {/* Income Chart */}
+                {chartData.length > 0 && (
+                    <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6">
+                        <h2 className="text-xl font-bold text-gray-800 mb-4">Income Trend</h2>
+                        <ResponsiveContainer width="100%" height={300}>
+                            <LineChart data={chartData}>
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis dataKey="date" />
+                                <YAxis />
+                                <Tooltip content={<CustomTooltip />} />
+                                <Line
+                                    type="monotone"
+                                    dataKey="amount"
+                                    stroke="#10b981"
+                                    strokeWidth={2}
+                                    dot={{ fill: '#10b981', r: 5 }}
+                                    activeDot={{ r: 7 }}
+                                />
+                            </LineChart>
+                        </ResponsiveContainer>
+                    </div>
+                )}
 
                 {/* Incomes List */}
                 <div className="bg-white rounded-xl shadow-md border border-gray-100">
@@ -164,11 +234,11 @@ const Income = () => {
             {/* Add Income Modal */}
             {showModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
+                    <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-2xl font-bold text-gray-800">Add income</h2>
                             <button
-                                onClick={() => setShowModal(false)}
+                                onClick={closeModal}
                                 className="text-gray-400 hover:text-gray-600"
                             >
                                 <X size={24} />

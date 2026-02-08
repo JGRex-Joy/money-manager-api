@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import api from '../utils/api';
 import { toast } from '../components/Toaster';
-import { Plus, Edit2, X, FolderOpen } from 'lucide-react';
+import { Plus, Edit2, Trash2, X, FolderOpen, AlertTriangle } from 'lucide-react';
 import EmojiPicker from 'emoji-picker-react';
 
 const Category = () => {
@@ -10,6 +10,8 @@ const Category = () => {
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+    const [showDeleteWarning, setShowDeleteWarning] = useState(false);
+    const [categoryToDelete, setCategoryToDelete] = useState(null);
     const [editMode, setEditMode] = useState(false);
     const [currentCategory, setCurrentCategory] = useState(null);
     const [formData, setFormData] = useState({
@@ -50,6 +52,28 @@ const Category = () => {
         }
     };
 
+    const handleDeleteClick = (category) => {
+        setCategoryToDelete(category);
+        setShowDeleteWarning(true);
+    };
+
+    const confirmDelete = async () => {
+        if (!categoryToDelete) return;
+
+        try {
+            await api.delete(`/categories/${categoryToDelete.id}`);
+            toast.success('Category and all related transactions deleted');
+            setShowDeleteWarning(false);
+            setCategoryToDelete(null);
+            fetchCategories();
+        } catch (error) {
+            const message = error.response?.data?.message || 'Failed to delete category';
+            toast.error(message);
+            setShowDeleteWarning(false);
+            setCategoryToDelete(null);
+        }
+    };
+
     const openEditModal = (category) => {
         setEditMode(true);
         setCurrentCategory(category);
@@ -65,6 +89,7 @@ const Category = () => {
         setShowModal(false);
         setEditMode(false);
         setCurrentCategory(null);
+        setShowEmojiPicker(false);
         setFormData({
             name: '',
             icon: '📁',
@@ -118,17 +143,22 @@ const Category = () => {
                                     >
                                         <div className="flex items-center space-x-3">
                                             <span className="text-3xl">{category.icon}</span>
-                                            <div>
-                                                <p className="font-semibold text-gray-800">{category.name}</p>
-                                                <p className="text-xs text-gray-500">ID: {category.id}</p>
-                                            </div>
+                                            <p className="font-semibold text-gray-800">{category.name}</p>
                                         </div>
-                                        <button
-                                            onClick={() => openEditModal(category)}
-                                            className="p-2 text-green-600 hover:bg-green-200 rounded-lg transition"
-                                        >
-                                            <Edit2 size={18} />
-                                        </button>
+                                        <div className="flex items-center space-x-2">
+                                            <button
+                                                onClick={() => openEditModal(category)}
+                                                className="p-2 text-green-600 hover:bg-green-200 rounded-lg transition"
+                                            >
+                                                <Edit2 size={18} />
+                                            </button>
+                                            <button
+                                                onClick={() => handleDeleteClick(category)}
+                                                className="p-2 text-red-600 hover:bg-red-200 rounded-lg transition"
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
@@ -161,17 +191,22 @@ const Category = () => {
                                     >
                                         <div className="flex items-center space-x-3">
                                             <span className="text-3xl">{category.icon}</span>
-                                            <div>
-                                                <p className="font-semibold text-gray-800">{category.name}</p>
-                                                <p className="text-xs text-gray-500">ID: {category.id}</p>
-                                            </div>
+                                            <p className="font-semibold text-gray-800">{category.name}</p>
                                         </div>
-                                        <button
-                                            onClick={() => openEditModal(category)}
-                                            className="p-2 text-red-600 hover:bg-red-200 rounded-lg transition"
-                                        >
-                                            <Edit2 size={18} />
-                                        </button>
+                                        <div className="flex items-center space-x-2">
+                                            <button
+                                                onClick={() => openEditModal(category)}
+                                                className="p-2 text-red-600 hover:bg-red-200 rounded-lg transition"
+                                            >
+                                                <Edit2 size={18} />
+                                            </button>
+                                            <button
+                                                onClick={() => handleDeleteClick(category)}
+                                                className="p-2 text-red-600 hover:bg-red-200 rounded-lg transition"
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
@@ -184,10 +219,64 @@ const Category = () => {
                 </div>
             </div>
 
+            {/* Delete Warning Modal */}
+            {showDeleteWarning && categoryToDelete && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+                        <div className="flex items-center space-x-3 mb-4">
+                            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                                <AlertTriangle className="text-red-600" size={24} />
+                            </div>
+                            <h2 className="text-2xl font-bold text-gray-800">Warning!</h2>
+                        </div>
+
+                        <div className="space-y-4">
+                            <p className="text-gray-700">
+                                You are about to delete the category{' '}
+                                <span className="font-bold">"{categoryToDelete.name}"</span>
+                            </p>
+
+                            <div className="bg-red-50 border-l-4 border-red-600 p-4 rounded">
+                                <p className="text-red-800 font-semibold mb-2">
+                                    ⚠️ This will permanently delete:
+                                </p>
+                                <ul className="text-red-700 space-y-1 ml-4">
+                                    <li>• The category itself</li>
+                                    <li>• ALL {categoryToDelete.type === 'income' ? 'income' : 'expense'} records using this category</li>
+                                    <li className="font-bold mt-2">• This action CANNOT be undone!</li>
+                                </ul>
+                            </div>
+
+                            <p className="text-gray-600 text-sm">
+                                Are you absolutely sure you want to continue?
+                            </p>
+                        </div>
+
+                        <div className="flex space-x-3 mt-6">
+                            <button
+                                onClick={() => {
+                                    setShowDeleteWarning(false);
+                                    setCategoryToDelete(null);
+                                }}
+                                className="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-300 transition"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={confirmDelete}
+                                className="flex-1 bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition"
+                            >
+                                Yes, Delete Everything
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Category Modal */}
             {showModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
+                    <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-2xl font-bold text-gray-800">
                                 {editMode ? 'Edit category' : 'Create category'}
@@ -255,7 +344,7 @@ const Category = () => {
                                                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                                         }`}
                                     >
-                                        Доход
+                                        Income
                                     </button>
                                     <button
                                         type="button"

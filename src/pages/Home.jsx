@@ -202,8 +202,8 @@ const Home = () => {
             <div className="space-y-6">
                 <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-800">Dashboard</h1>
-                        <p className="text-gray-500 mt-1">Financial overview and analytics</p>
+                        <h1 className="text-4xl lg:text-5xl font-bold text-gray-800 mb-2">Dashboard</h1>
+                        <p className="text-lg text-gray-500">Financial overview and analytics</p>
                     </div>
                     <div className="lg:w-80">
                         <DateRangeFilter onFilterChange={handleDateRangeChange} />

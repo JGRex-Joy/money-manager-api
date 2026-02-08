@@ -5,6 +5,7 @@ import { formatCurrency, formatDate } from '../utils/formatters';
 import { toast } from '../components/Toaster';
 import { Plus, Trash2, X } from 'lucide-react';
 import EmojiPicker from 'emoji-picker-react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const Expense = () => {
     const [expenses, setExpenses] = useState([]);
@@ -68,7 +69,7 @@ const Expense = () => {
     };
 
     const handleDelete = async (id) => {
-        if (confirm('Delete thos expense?')) {
+        if (confirm('Delete this expense?')) {
             try {
                 await api.delete(`/expenses/${id}`);
                 toast.success('Expense deleted');
@@ -79,7 +80,53 @@ const Expense = () => {
         }
     };
 
+    const closeModal = () => {
+        setShowModal(false);
+        setShowEmojiPicker(false);
+        setFormData({
+            name: '',
+            icon: '🛒',
+            categoryId: '',
+            amount: '',
+            date: new Date().toISOString().split('T')[0],
+        });
+    };
+
     const totalExpense = expenses.reduce((sum, expense) => sum + Number(expense.amount), 0);
+
+    // Prepare chart data
+    const getChartData = () => {
+        const sortedExpenses = [...expenses].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+        return sortedExpenses.map(expense => ({
+            date: new Date(expense.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+            fullDate: formatDate(expense.date),
+            amount: Number(expense.amount),
+            name: expense.name,
+            category: expense.categoryName,
+            icon: expense.icon
+        }));
+    };
+
+    const CustomTooltip = ({ active, payload }) => {
+        if (active && payload && payload.length) {
+            const data = payload[0].payload;
+            return (
+                <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-4">
+                    <p className="font-semibold text-gray-800 flex items-center space-x-2">
+                        <span className="text-2xl">{data.icon}</span>
+                        <span>{data.name}</span>
+                    </p>
+                    <p className="text-sm text-gray-600 mt-1">Category: {data.category}</p>
+                    <p className="text-sm text-gray-600">Date: {data.fullDate}</p>
+                    <p className="text-lg font-bold text-red-600 mt-2">{formatCurrency(data.amount)}</p>
+                </div>
+            );
+        }
+        return null;
+    };
+
+    const chartData = getChartData();
 
     return (
         <Layout>
@@ -104,6 +151,29 @@ const Expense = () => {
                     <p className="text-red-100 text-sm font-medium">Total expenses this month</p>
                     <p className="text-4xl font-bold mt-2">{formatCurrency(totalExpense)}</p>
                 </div>
+
+                {/* Expense Chart */}
+                {chartData.length > 0 && (
+                    <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6">
+                        <h2 className="text-xl font-bold text-gray-800 mb-4">Expense Trend</h2>
+                        <ResponsiveContainer width="100%" height={300}>
+                            <LineChart data={chartData}>
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis dataKey="date" />
+                                <YAxis />
+                                <Tooltip content={<CustomTooltip />} />
+                                <Line
+                                    type="monotone"
+                                    dataKey="amount"
+                                    stroke="#ef4444"
+                                    strokeWidth={2}
+                                    dot={{ fill: '#ef4444', r: 5 }}
+                                    activeDot={{ r: 7 }}
+                                />
+                            </LineChart>
+                        </ResponsiveContainer>
+                    </div>
+                )}
 
                 {/* Expenses List */}
                 <div className="bg-white rounded-xl shadow-md border border-gray-100">
@@ -154,7 +224,7 @@ const Expense = () => {
                             </div>
                         ) : (
                             <div className="text-center py-12">
-                                    <p className="text-gray-500">No expenses for this month</p>
+                                <p className="text-gray-500">No expenses for this month</p>
                             </div>
                         )}
                     </div>
@@ -164,11 +234,11 @@ const Expense = () => {
             {/* Add Expense Modal */}
             {showModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
+                    <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-2xl font-bold text-gray-800">Add expense</h2>
                             <button
-                                onClick={() => setShowModal(false)}
+                                onClick={closeModal}
                                 className="text-gray-400 hover:text-gray-600"
                             >
                                 <X size={24} />
@@ -186,7 +256,7 @@ const Expense = () => {
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                     required
                                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                                    placeholder="Продукты"
+                                    placeholder="Groceries"
                                 />
                             </div>
 

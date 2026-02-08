@@ -7,7 +7,6 @@ import {
     Filter,
     LogOut,
     Wallet,
-    User,
     Menu,
     X
 } from 'lucide-react';
@@ -53,16 +52,11 @@ const Sidebar = () => {
 
             {/* User Profile */}
             <div className="p-6 border-b border-gray-200">
-                <div className="flex items-center space-x-3">
-                    <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center">
-                        <User className="text-blue-600" size={24} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-gray-800 truncate">
-                            {user.fullName || 'User'}
-                        </p>
-                        <p className="text-xs text-gray-500 truncate">{user.email}</p>
-                    </div>
+                <div className="flex flex-col">
+                    <p className="text-sm font-semibold text-gray-800 truncate">
+                        {user.fullName || 'User'}
+                    </p>
+                    <p className="text-xs text-gray-500 truncate mt-1">{user.email}</p>
                 </div>
             </div>
 

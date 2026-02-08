@@ -215,17 +215,13 @@ const Home = () => {
                         const Icon = stat.icon;
                         return (
                             <div key={stat.title} className="bg-white rounded-xl shadow-md p-6 border border-gray-100 hover:shadow-lg transition">
-                                <div className="flex items-center justify-between">
-                                    <div className="flex-1">
-                                        <p className="text-gray-500 text-sm font-medium">{stat.title}</p>
-                                        <p className={`text-3xl font-bold mt-2 ${stat.textColor}`}>
-                                            {stat.isPercentage ? stat.value : formatCurrency(stat.value)}
-                                        </p>
-                                    </div>
-                                    <div className={`${stat.bgColor} p-4 rounded-xl`}>
-                                        <Icon className={stat.iconColor} size={32} />
-                                    </div>
+                                <div className="flex items-center space-x-2 mb-2">
+                                    <Icon className={stat.iconColor} size={16} />
+                                    <p className="text-gray-500 text-sm font-medium">{stat.title}</p>
                                 </div>
+                                <p className={`text-3xl font-bold ${stat.textColor}`}>
+                                    {stat.isPercentage ? stat.value : formatCurrency(stat.value)}
+                                </p>
                             </div>
                         );
                     })}

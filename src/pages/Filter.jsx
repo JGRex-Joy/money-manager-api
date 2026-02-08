@@ -64,7 +64,7 @@ const Filter = () => {
                                             : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                                     }`}
                                 >
-                                    Доходы
+                                    Incomes
                                 </button>
                                 <button
                                     type="button"
@@ -147,7 +147,7 @@ const Filter = () => {
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Порядок
+                                    Order
                                 </label>
                                 <div className="grid grid-cols-2 gap-2">
                                     <button
@@ -160,7 +160,7 @@ const Filter = () => {
                                         }`}
                                     >
                                         <SortAsc size={18} />
-                                        <span>Возр.</span>
+                                        <span>Asc.</span>
                                     </button>
                                     <button
                                         type="button"
@@ -172,7 +172,7 @@ const Filter = () => {
                                         }`}
                                     >
                                         <SortDesc size={18} />
-                                        <span>Убыв.</span>
+                                        <span>Desc.</span>
                                     </button>
                                 </div>
                             </div>
@@ -185,7 +185,7 @@ const Filter = () => {
                             className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
                         >
                             <Search size={20} />
-                            <span>{loading ? 'Поиск...' : 'Применить фильтр'}</span>
+                            <span>{loading ? 'Searching...' : 'Use filter'}</span>
                         </button>
                     </form>
                 </div>
@@ -202,7 +202,7 @@ const Filter = () => {
                                     <div className={`text-xl font-bold ${
                                         filterData.type === 'income' ? 'text-green-600' : 'text-red-600'
                                     }`}>
-                                        Всего: {formatCurrency(totalAmount)}
+                                        Total: {formatCurrency(totalAmount)}
                                     </div>
                                 )}
                             </div>

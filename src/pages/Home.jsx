@@ -27,7 +27,7 @@ const Home = () => {
         if (dashboardData) {
             fetchFilteredData();
         }
-    }, [dateRange]);
+    }, [dateRange, dashboardData]);
 
     const fetchDashboardData = async () => {
         try {
@@ -61,11 +61,12 @@ const Home = () => {
             });
 
             setFilteredData({
-                incomes: incomeResponse.data,
-                expenses: expenseResponse.data
+                incomes: incomeResponse.data || [],
+                expenses: expenseResponse.data || []
             });
         } catch (error) {
             console.error('Error fetching filtered data:', error);
+            toast.error('Error loading filtered data');
         }
     };
 
@@ -73,7 +74,7 @@ const Home = () => {
         setDateRange({ startDate: start, endDate: end });
     };
 
-    if (loading) {
+    if (loading || !filteredData) {
         return (
             <Layout>
                 <div className="flex items-center justify-center h-64">
@@ -126,19 +127,19 @@ const Home = () => {
     const pieData = [
         { name: 'Income', value: filteredIncome, color: '#10b981' },
         { name: 'Expenses', value: filteredExpense, color: '#ef4444' },
-    ];
+    ].filter(item => item.value > 0);
 
     const getCategoryData = () => {
         const expensesByCategory = {};
         const incomesByCategory = {};
 
         filteredData?.expenses?.forEach(exp => {
-            const category = exp.categoryName;
+            const category = exp.categoryName || 'Uncategorized';
             expensesByCategory[category] = (expensesByCategory[category] || 0) + Number(exp.amount);
         });
 
         filteredData?.incomes?.forEach(inc => {
-            const category = inc.categoryName;
+            const category = inc.categoryName || 'Uncategorized';
             incomesByCategory[category] = (incomesByCategory[category] || 0) + Number(inc.amount);
         });
 
@@ -166,19 +167,21 @@ const Home = () => {
             dailyData[date].expenses += Number(exp.amount);
         });
 
-        return Object.values(dailyData)
+        const result = Object.values(dailyData)
             .sort((a, b) => new Date(a.date) - new Date(b.date))
             .map(item => ({
                 ...item,
                 date: new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
             }));
+
+        return result.length > 0 ? result : [];
     };
 
     const getTopExpenseCategories = () => {
         const categoryTotals = {};
 
         filteredData?.expenses?.forEach(exp => {
-            const category = exp.categoryName;
+            const category = exp.categoryName || 'Uncategorized';
             categoryTotals[category] = (categoryTotals[category] || 0) + Number(exp.amount);
         });
 
@@ -189,6 +192,10 @@ const Home = () => {
     };
 
     const COLORS = ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#ef4444'];
+
+    const dailyTrendData = getDailyTrend();
+    const categoryData = getCategoryData();
+    const topExpenseCategories = getTopExpenseCategories();
 
     return (
         <Layout>
@@ -227,87 +234,110 @@ const Home = () => {
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                     <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
                         <h2 className="text-xl font-bold text-gray-800 mb-4">Daily Trend</h2>
-                        <ResponsiveContainer width="100%" height={300}>
-                            <LineChart data={getDailyTrend()}>
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="date" />
-                                <YAxis />
-                                <Tooltip formatter={(value) => formatCurrency(value)} />
-                                <Legend />
-                                <Line type="monotone" dataKey="income" stroke="#10b981" strokeWidth={2} name="Income" />
-                                <Line type="monotone" dataKey="expenses" stroke="#ef4444" strokeWidth={2} name="Expenses" />
-                            </LineChart>
-                        </ResponsiveContainer>
+                        {dailyTrendData.length > 0 ? (
+                            <ResponsiveContainer width="100%" height={300}>
+                                <LineChart data={dailyTrendData}>
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="date" />
+                                    <YAxis />
+                                    <Tooltip formatter={(value) => formatCurrency(value)} />
+                                    <Legend />
+                                    <Line type="monotone" dataKey="income" stroke="#10b981" strokeWidth={2} name="Income" />
+                                    <Line type="monotone" dataKey="expenses" stroke="#ef4444" strokeWidth={2} name="Expenses" />
+                                </LineChart>
+                            </ResponsiveContainer>
+                        ) : (
+                            <div className="h-[300px] flex items-center justify-center text-gray-400">
+                                No data for selected period
+                            </div>
+                        )}
                     </div>
 
                     <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
                         <h2 className="text-xl font-bold text-gray-800 mb-4">Income vs Expenses</h2>
-                        <ResponsiveContainer width="100%" height={300}>
-                            <PieChart>
-                                <Pie
-                                    data={pieData}
-                                    cx="50%"
-                                    cy="50%"
-                                    labelLine={false}
-                                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                                    outerRadius={100}
-                                    fill="#8884d8"
-                                    dataKey="value"
-                                >
-                                    {pieData.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={entry.color} />
-                                    ))}
-                                </Pie>
-                                <Tooltip formatter={(value) => formatCurrency(value)} />
-                                <Legend />
-                            </PieChart>
-                        </ResponsiveContainer>
+                        {pieData.length > 0 ? (
+                            <ResponsiveContainer width="100%" height={300}>
+                                <PieChart>
+                                    <Pie
+                                        data={pieData}
+                                        cx="50%"
+                                        cy="50%"
+                                        labelLine={false}
+                                        label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                                        outerRadius={100}
+                                        fill="#8884d8"
+                                        dataKey="value"
+                                    >
+                                        {pieData.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={entry.color} />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip formatter={(value) => formatCurrency(value)} />
+                                    <Legend />
+                                </PieChart>
+                            </ResponsiveContainer>
+                        ) : (
+                            <div className="h-[300px] flex items-center justify-center text-gray-400">
+                                No data for selected period
+                            </div>
+                        )}
                     </div>
                 </div>
 
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                     <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
                         <h2 className="text-xl font-bold text-gray-800 mb-4">By Category</h2>
-                        <ResponsiveContainer width="100%" height={300}>
-                            <BarChart data={getCategoryData()}>
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="category" />
-                                <YAxis />
-                                <Tooltip formatter={(value) => formatCurrency(value)} />
-                                <Legend />
-                                <Bar dataKey="income" fill="#10b981" name="Income" />
-                                <Bar dataKey="expenses" fill="#ef4444" name="Expenses" />
-                            </BarChart>
-                        </ResponsiveContainer>
+                        {categoryData.length > 0 ? (
+                            <ResponsiveContainer width="100%" height={300}>
+                                <BarChart data={categoryData}>
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="category" />
+                                    <YAxis />
+                                    <Tooltip formatter={(value) => formatCurrency(value)} />
+                                    <Legend />
+                                    <Bar dataKey="income" fill="#10b981" name="Income" />
+                                    <Bar dataKey="expenses" fill="#ef4444" name="Expenses" />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        ) : (
+                            <div className="h-[300px] flex items-center justify-center text-gray-400">
+                                No data for selected period
+                            </div>
+                        )}
                     </div>
 
                     <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
                         <h2 className="text-xl font-bold text-gray-800 mb-4">Top Expense Categories</h2>
-                        <ResponsiveContainer width="100%" height={300}>
-                            <PieChart>
-                                <Pie
-                                    data={getTopExpenseCategories()}
-                                    cx="50%"
-                                    cy="50%"
-                                    labelLine={false}
-                                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                                    outerRadius={100}
-                                    fill="#8884d8"
-                                    dataKey="value"
-                                >
-                                    {getTopExpenseCategories().map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                    ))}
-                                </Pie>
-                                <Tooltip formatter={(value) => formatCurrency(value)} />
-                            </PieChart>
-                        </ResponsiveContainer>
+                        {topExpenseCategories.length > 0 ? (
+                            <ResponsiveContainer width="100%" height={300}>
+                                <PieChart>
+                                    <Pie
+                                        data={topExpenseCategories}
+                                        cx="50%"
+                                        cy="50%"
+                                        labelLine={false}
+                                        label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                                        outerRadius={100}
+                                        fill="#8884d8"
+                                        dataKey="value"
+                                    >
+                                        {topExpenseCategories.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip formatter={(value) => formatCurrency(value)} />
+                                </PieChart>
+                            </ResponsiveContainer>
+                        ) : (
+                            <div className="h-[300px] flex items-center justify-center text-gray-400">
+                                No expense data for selected period
+                            </div>
+                        )}
                     </div>
                 </div>
 
                 <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
                     <div className="flex items-center justify-between mb-4">
-                        <h2 className="text-xl font-bold text-gray-800">Recent Transactions</h2>
                         <h2 className="text-xl font-bold text-gray-800">Recent Transactions</h2>
                         <Activity className="text-gray-400" size={24} />
                     </div>

@@ -1,28 +1,76 @@
 import { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
+import DateRangeFilter from '../components/DateRangeFilter';
 import api from '../utils/api';
 import { formatCurrency, formatDate } from '../utils/formatters';
 import { toast } from '../components/Toaster';
-import { Wallet, TrendingUp, TrendingDown, Activity } from 'lucide-react';
-import { AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { Wallet, TrendingUp, TrendingDown, Activity, DollarSign } from 'lucide-react';
+import {
+    AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, LineChart, Line,
+    XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
+} from 'recharts';
 
 const Home = () => {
     const [dashboardData, setDashboardData] = useState(null);
+    const [filteredData, setFilteredData] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [dateRange, setDateRange] = useState({
+        startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
+        endDate: new Date().toISOString().split('T')[0]
+    });
 
     useEffect(() => {
         fetchDashboardData();
     }, []);
+
+    useEffect(() => {
+        if (dashboardData) {
+            fetchFilteredData();
+        }
+    }, [dateRange]);
 
     const fetchDashboardData = async () => {
         try {
             const response = await api.get('/dashboard');
             setDashboardData(response.data);
         } catch (error) {
-            toast.error('Ошибка загрузки данных');
+            toast.error('Error loading dashboard data');
         } finally {
             setLoading(false);
         }
+    };
+
+    const fetchFilteredData = async () => {
+        try {
+            const incomeResponse = await api.post('/filter', {
+                type: 'income',
+                startDate: dateRange.startDate,
+                endDate: dateRange.endDate,
+                keyword: '',
+                sortField: 'date',
+                sortOrder: 'desc'
+            });
+
+            const expenseResponse = await api.post('/filter', {
+                type: 'expense',
+                startDate: dateRange.startDate,
+                endDate: dateRange.endDate,
+                keyword: '',
+                sortField: 'date',
+                sortOrder: 'desc'
+            });
+
+            setFilteredData({
+                incomes: incomeResponse.data,
+                expenses: expenseResponse.data
+            });
+        } catch (error) {
+            console.error('Error fetching filtered data:', error);
+        }
+    };
+
+    const handleDateRangeChange = (start, end) => {
+        setDateRange({ startDate: start, endDate: end });
     };
 
     if (loading) {
@@ -35,50 +83,61 @@ const Home = () => {
         );
     }
 
+    const filteredIncome = filteredData?.incomes?.reduce((sum, i) => sum + Number(i.amount), 0) || 0;
+    const filteredExpense = filteredData?.expenses?.reduce((sum, e) => sum + Number(e.amount), 0) || 0;
+    const filteredBalance = filteredIncome - filteredExpense;
+
     const stats = [
         {
-            title: 'Общий баланс',
-            value: dashboardData?.totalBalance || 0,
+            title: 'Total Balance',
+            value: filteredBalance,
             icon: Wallet,
-            color: 'blue',
             bgColor: 'bg-blue-50',
             textColor: 'text-blue-600',
+            iconColor: 'text-blue-600'
         },
         {
-            title: 'Доходы',
-            value: dashboardData?.totalIncome || 0,
+            title: 'Total Income',
+            value: filteredIncome,
             icon: TrendingUp,
-            color: 'green',
             bgColor: 'bg-green-50',
             textColor: 'text-green-600',
+            iconColor: 'text-green-600'
         },
         {
-            title: 'Расходы',
-            value: dashboardData?.totalExpense || 0,
+            title: 'Total Expenses',
+            value: filteredExpense,
             icon: TrendingDown,
-            color: 'red',
             bgColor: 'bg-red-50',
             textColor: 'text-red-600',
+            iconColor: 'text-red-600'
         },
+        {
+            title: 'Savings Rate',
+            value: filteredIncome > 0 ? ((filteredBalance / filteredIncome) * 100).toFixed(1) + '%' : '0%',
+            icon: DollarSign,
+            bgColor: 'bg-purple-50',
+            textColor: 'text-purple-600',
+            iconColor: 'text-purple-600',
+            isPercentage: true
+        }
     ];
 
-    // Подготовка данных для графиков
     const pieData = [
-        { name: 'Доходы', value: Number(dashboardData?.totalIncome || 0), color: '#10b981' },
-        { name: 'Расходы', value: Number(dashboardData?.totalExpense || 0), color: '#ef4444' },
+        { name: 'Income', value: filteredIncome, color: '#10b981' },
+        { name: 'Expenses', value: filteredExpense, color: '#ef4444' },
     ];
 
-    // Группировка транзакций по категориям для bar chart
     const getCategoryData = () => {
         const expensesByCategory = {};
         const incomesByCategory = {};
 
-        dashboardData?.recent5Expenses?.forEach(exp => {
+        filteredData?.expenses?.forEach(exp => {
             const category = exp.categoryName;
             expensesByCategory[category] = (expensesByCategory[category] || 0) + Number(exp.amount);
         });
 
-        dashboardData?.recent5Incomes?.forEach(inc => {
+        filteredData?.incomes?.forEach(inc => {
             const category = inc.categoryName;
             incomesByCategory[category] = (incomesByCategory[category] || 0) + Number(inc.amount);
         });
@@ -87,35 +146,77 @@ const Home = () => {
 
         return categories.map(category => ({
             category,
-            расходы: expensesByCategory[category] || 0,
-            доходы: incomesByCategory[category] || 0,
+            expenses: expensesByCategory[category] || 0,
+            income: incomesByCategory[category] || 0,
         }));
     };
+
+    const getDailyTrend = () => {
+        const dailyData = {};
+
+        filteredData?.incomes?.forEach(inc => {
+            const date = inc.date;
+            if (!dailyData[date]) dailyData[date] = { date, income: 0, expenses: 0 };
+            dailyData[date].income += Number(inc.amount);
+        });
+
+        filteredData?.expenses?.forEach(exp => {
+            const date = exp.date;
+            if (!dailyData[date]) dailyData[date] = { date, income: 0, expenses: 0 };
+            dailyData[date].expenses += Number(exp.amount);
+        });
+
+        return Object.values(dailyData)
+            .sort((a, b) => new Date(a.date) - new Date(b.date))
+            .map(item => ({
+                ...item,
+                date: new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+            }));
+    };
+
+    const getTopExpenseCategories = () => {
+        const categoryTotals = {};
+
+        filteredData?.expenses?.forEach(exp => {
+            const category = exp.categoryName;
+            categoryTotals[category] = (categoryTotals[category] || 0) + Number(exp.amount);
+        });
+
+        return Object.entries(categoryTotals)
+            .map(([name, value]) => ({ name, value }))
+            .sort((a, b) => b.value - a.value)
+            .slice(0, 5);
+    };
+
+    const COLORS = ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#ef4444'];
 
     return (
         <Layout>
             <div className="space-y-6">
-                {/* Header */}
-                <div>
-                    <h1 className="text-3xl font-bold text-gray-800">Панель управления</h1>
-                    <p className="text-gray-500 mt-1">Обзор ваших финансов</p>
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                    <div>
+                        <h1 className="text-3xl font-bold text-gray-800">Dashboard</h1>
+                        <p className="text-gray-500 mt-1">Financial overview and analytics</p>
+                    </div>
+                    <div className="lg:w-80">
+                        <DateRangeFilter onFilterChange={handleDateRangeChange} />
+                    </div>
                 </div>
 
-                {/* Stats Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
                     {stats.map((stat) => {
                         const Icon = stat.icon;
                         return (
-                            <div key={stat.title} className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+                            <div key={stat.title} className="bg-white rounded-xl shadow-md p-6 border border-gray-100 hover:shadow-lg transition">
                                 <div className="flex items-center justify-between">
-                                    <div>
+                                    <div className="flex-1">
                                         <p className="text-gray-500 text-sm font-medium">{stat.title}</p>
                                         <p className={`text-3xl font-bold mt-2 ${stat.textColor}`}>
-                                            {formatCurrency(stat.value)}
+                                            {stat.isPercentage ? stat.value : formatCurrency(stat.value)}
                                         </p>
                                     </div>
                                     <div className={`${stat.bgColor} p-4 rounded-xl`}>
-                                        <Icon className={stat.textColor} size={32} />
+                                        <Icon className={stat.iconColor} size={32} />
                                     </div>
                                 </div>
                             </div>
@@ -123,11 +224,24 @@ const Home = () => {
                     })}
                 </div>
 
-                {/* Charts */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {/* Pie Chart */}
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                     <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
-                        <h2 className="text-xl font-bold text-gray-800 mb-4">Распределение финансов</h2>
+                        <h2 className="text-xl font-bold text-gray-800 mb-4">Daily Trend</h2>
+                        <ResponsiveContainer width="100%" height={300}>
+                            <LineChart data={getDailyTrend()}>
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis dataKey="date" />
+                                <YAxis />
+                                <Tooltip formatter={(value) => formatCurrency(value)} />
+                                <Legend />
+                                <Line type="monotone" dataKey="income" stroke="#10b981" strokeWidth={2} name="Income" />
+                                <Line type="monotone" dataKey="expenses" stroke="#ef4444" strokeWidth={2} name="Expenses" />
+                            </LineChart>
+                        </ResponsiveContainer>
+                    </div>
+
+                    <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+                        <h2 className="text-xl font-bold text-gray-800 mb-4">Income vs Expenses</h2>
                         <ResponsiveContainer width="100%" height={300}>
                             <PieChart>
                                 <Pie
@@ -149,10 +263,11 @@ const Home = () => {
                             </PieChart>
                         </ResponsiveContainer>
                     </div>
+                </div>
 
-                    {/* Bar Chart */}
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                     <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
-                        <h2 className="text-xl font-bold text-gray-800 mb-4">По категориям</h2>
+                        <h2 className="text-xl font-bold text-gray-800 mb-4">By Category</h2>
                         <ResponsiveContainer width="100%" height={300}>
                             <BarChart data={getCategoryData()}>
                                 <CartesianGrid strokeDasharray="3 3" />
@@ -160,32 +275,54 @@ const Home = () => {
                                 <YAxis />
                                 <Tooltip formatter={(value) => formatCurrency(value)} />
                                 <Legend />
-                                <Bar dataKey="доходы" fill="#10b981" />
-                                <Bar dataKey="расходы" fill="#ef4444" />
+                                <Bar dataKey="income" fill="#10b981" name="Income" />
+                                <Bar dataKey="expenses" fill="#ef4444" name="Expenses" />
                             </BarChart>
+                        </ResponsiveContainer>
+                    </div>
+
+                    <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+                        <h2 className="text-xl font-bold text-gray-800 mb-4">Top Expense Categories</h2>
+                        <ResponsiveContainer width="100%" height={300}>
+                            <PieChart>
+                                <Pie
+                                    data={getTopExpenseCategories()}
+                                    cx="50%"
+                                    cy="50%"
+                                    labelLine={false}
+                                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                                    outerRadius={100}
+                                    fill="#8884d8"
+                                    dataKey="value"
+                                >
+                                    {getTopExpenseCategories().map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                    ))}
+                                </Pie>
+                                <Tooltip formatter={(value) => formatCurrency(value)} />
+                            </PieChart>
                         </ResponsiveContainer>
                     </div>
                 </div>
 
-                {/* Recent Transactions */}
                 <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
                     <div className="flex items-center justify-between mb-4">
-                        <h2 className="text-xl font-bold text-gray-800">Последние транзакции</h2>
+                        <h2 className="text-xl font-bold text-gray-800">Recent Transactions</h2>
                         <Activity className="text-gray-400" size={24} />
                     </div>
                     <div className="overflow-x-auto">
                         <table className="w-full">
                             <thead>
                             <tr className="border-b border-gray-200">
-                                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">Название</th>
-                                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">Тип</th>
-                                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">Дата</th>
-                                <th className="text-right py-3 px-4 text-sm font-semibold text-gray-600">Сумма</th>
+                                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">Name</th>
+                                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">Type</th>
+                                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">Date</th>
+                                <th className="text-right py-3 px-4 text-sm font-semibold text-gray-600">Amount</th>
                             </tr>
                             </thead>
                             <tbody>
                             {dashboardData?.recentTransactions?.length > 0 ? (
-                                dashboardData.recentTransactions.map((transaction) => (
+                                dashboardData.recentTransactions.slice(0, 10).map((transaction) => (
                                     <tr key={`${transaction.type}-${transaction.id}`} className="border-b border-gray-100 hover:bg-gray-50">
                                         <td className="py-4 px-4">
                                             <div className="flex items-center space-x-3">
@@ -199,7 +336,7 @@ const Home = () => {
                                                         ? 'bg-green-100 text-green-700'
                                                         : 'bg-red-100 text-red-700'
                                                 }`}>
-                                                    {transaction.type === 'income' ? 'Доход' : 'Расход'}
+                                                    {transaction.type === 'income' ? 'Income' : 'Expense'}
                                                 </span>
                                         </td>
                                         <td className="py-4 px-4 text-gray-600">{formatDate(transaction.date)}</td>
@@ -213,7 +350,7 @@ const Home = () => {
                             ) : (
                                 <tr>
                                     <td colSpan="4" className="py-8 text-center text-gray-500">
-                                        Нет транзакций
+                                        No transactions found
                                     </td>
                                 </tr>
                             )}

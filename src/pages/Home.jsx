@@ -73,6 +73,44 @@ const Home = () => {
         setDateRange({ startDate: start, endDate: end });
     };
 
+    // Функция для определения размера шрифта в зависимости от длины числа
+    const getAdaptiveFontSize = (value, isPercentage = false) => {
+        if (isPercentage) {
+            return 'text-3xl';
+        }
+
+        const valueStr = Math.abs(value).toString();
+        const length = valueStr.length;
+
+        if (length <= 6) return 'text-3xl'; // До 999,999
+        if (length <= 8) return 'text-2xl'; // До 99,999,999
+        if (length <= 10) return 'text-xl'; // До 9,999,999,999
+        return 'text-lg'; // Для очень больших чисел
+    };
+
+    // Функция для форматирования больших чисел с сокращениями
+    const formatCompactNumber = (amount) => {
+        const absAmount = Math.abs(amount);
+        const sign = amount < 0 ? '-' : '';
+
+        if (absAmount >= 1000000000) {
+            return sign + (absAmount / 1000000000).toFixed(1) + 'B';
+        }
+
+        if (absAmount >= 1000000) {
+            return sign + (absAmount / 1000000).toFixed(1) + 'M';
+        }
+
+        if (absAmount >= 1000) {
+            return sign + (absAmount / 1000).toFixed(0) + 'K';
+        }
+
+        return sign + new Intl.NumberFormat('ru-RU', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2,
+        }).format(absAmount);
+    };
+
     if (loading || !filteredData) {
         return (
             <Layout>
@@ -212,15 +250,38 @@ const Home = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
                     {stats.map((stat) => {
                         const Icon = stat.icon;
+                        const fontSize = stat.isPercentage
+                            ? 'text-3xl'
+                            : getAdaptiveFontSize(stat.isPercentage ? 0 : stat.value);
+
                         return (
                             <div key={stat.title} className="bg-white rounded-xl shadow-md p-6 border border-gray-100 hover:shadow-lg transition">
                                 <div className="flex items-center space-x-2 mb-2">
                                     <Icon className={stat.iconColor} size={16} />
                                     <p className="text-gray-500 text-sm font-medium">{stat.title}</p>
                                 </div>
-                                <p className={`text-3xl font-bold ${stat.textColor}`}>
-                                    {stat.isPercentage ? stat.value : formatCurrency(stat.value)}
-                                </p>
+                                <div className="relative group">
+                                    {stat.isPercentage ? (
+                                        <p className={`text-3xl font-bold ${stat.textColor} transition-all break-words`}>
+                                            {stat.value}
+                                        </p>
+                                    ) : (
+                                        <div className="flex items-baseline space-x-1">
+                                            <p className={`${fontSize} font-bold ${stat.textColor} transition-all break-words`}>
+                                                {formatCompactNumber(stat.value)}
+                                            </p>
+                                            <span className={`text-lg font-semibold ${stat.textColor} opacity-80`}>
+                                                KGS
+                                            </span>
+                                        </div>
+                                    )}
+                                    {/* Tooltip для полного значения при наведении */}
+                                    {!stat.isPercentage && Math.abs(stat.value).toString().length > 8 && (
+                                        <div className="absolute left-0 top-full mt-2 bg-gray-800 text-white text-sm px-3 py-2 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 whitespace-nowrap">
+                                            {formatCurrency(stat.value)}
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         );
                     })}

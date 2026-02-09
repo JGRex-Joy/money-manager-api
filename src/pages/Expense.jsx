@@ -13,6 +13,8 @@ const Expense = () => {
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
+    const [deletingId, setDeletingId] = useState(null);
     const [formData, setFormData] = useState({
         name: '',
         icon: '🛒',
@@ -48,6 +50,9 @@ const Expense = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (submitting) return;
+
+        setSubmitting(true);
         try {
             await api.post('/expenses', {
                 ...formData,
@@ -65,22 +70,29 @@ const Expense = () => {
             fetchExpenses();
         } catch (error) {
             toast.error('Expense adding error');
+        } finally {
+            setSubmitting(false);
         }
     };
 
     const handleDelete = async (id) => {
-        if (confirm('Delete this expense?')) {
-            try {
-                await api.delete(`/expenses/${id}`);
-                toast.success('Expense deleted');
-                fetchExpenses();
-            } catch (error) {
-                toast.error('Expense delete error');
-            }
+        if (deletingId) return;
+        if (!confirm('Delete this expense?')) return;
+
+        setDeletingId(id);
+        try {
+            await api.delete(`/expenses/${id}`);
+            toast.success('Expense deleted');
+            fetchExpenses();
+        } catch (error) {
+            toast.error('Expense delete error');
+        } finally {
+            setDeletingId(null);
         }
     };
 
     const closeModal = () => {
+        if (submitting) return;
         setShowModal(false);
         setShowEmojiPicker(false);
         setFormData({
@@ -137,7 +149,8 @@ const Expense = () => {
                     </div>
                     <button
                         onClick={() => setShowModal(true)}
-                        className="flex items-center justify-center space-x-2 bg-red-600 text-white px-4 sm:px-6 py-3 rounded-lg hover:bg-red-700 transition shadow-lg"
+                        disabled={submitting}
+                        className="flex items-center justify-center space-x-2 bg-red-600 text-white px-4 sm:px-6 py-3 rounded-lg hover:bg-red-700 transition shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <Plus size={20} />
                         <span>Add expense</span>
@@ -207,9 +220,14 @@ const Expense = () => {
                                             <td className="py-3 sm:py-4 px-2 sm:px-4 text-center">
                                                 <button
                                                     onClick={() => handleDelete(expense.id)}
-                                                    className="text-red-600 hover:text-red-700 p-2 hover:bg-red-50 rounded-lg transition"
+                                                    disabled={deletingId === expense.id}
+                                                    className="text-red-600 hover:text-red-700 p-2 hover:bg-red-50 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
                                                 >
-                                                    <Trash2 size={16} className="sm:w-[18px] sm:h-[18px]" />
+                                                    {deletingId === expense.id ? (
+                                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600"></div>
+                                                    ) : (
+                                                        <Trash2 size={16} className="sm:w-[18px] sm:h-[18px]" />
+                                                    )}
                                                 </button>
                                             </td>
                                         </tr>
@@ -231,7 +249,11 @@ const Expense = () => {
                     <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-4 sm:p-6 max-h-[90vh] overflow-y-auto animate-scale-in">
                         <div className="flex justify-between items-center mb-4 sm:mb-6">
                             <h2 className="text-xl sm:text-2xl font-bold text-gray-800">Add expense</h2>
-                            <button onClick={closeModal} className="text-gray-400 hover:text-gray-600 p-1">
+                            <button
+                                onClick={closeModal}
+                                disabled={submitting}
+                                className="text-gray-400 hover:text-gray-600 p-1 disabled:opacity-50"
+                            >
                                 <X size={24} />
                             </button>
                         </div>
@@ -244,7 +266,8 @@ const Expense = () => {
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                     required
-                                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm sm:text-base"
+                                    disabled={submitting}
+                                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
                                     placeholder="Groceries"
                                 />
                             </div>
@@ -255,12 +278,13 @@ const Expense = () => {
                                     <button
                                         type="button"
                                         onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                                        className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg text-left flex items-center space-x-2"
+                                        disabled={submitting}
+                                        className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg text-left flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         <span className="text-xl sm:text-2xl">{formData.icon}</span>
                                         <span className="text-gray-500 text-sm sm:text-base">Choose icon</span>
                                     </button>
-                                    {showEmojiPicker && (
+                                    {showEmojiPicker && !submitting && (
                                         <div className="absolute z-10 mt-2 left-0 right-0">
                                             <EmojiPicker
                                                 onEmojiClick={(emojiData) => {
@@ -280,7 +304,8 @@ const Expense = () => {
                                     value={formData.categoryId}
                                     onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
                                     required
-                                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm sm:text-base"
+                                    disabled={submitting}
+                                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     <option value="">Choose category</option>
                                     {categories.map((cat) => (
@@ -297,7 +322,8 @@ const Expense = () => {
                                     value={formData.amount}
                                     onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
                                     required
-                                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm sm:text-base"
+                                    disabled={submitting}
+                                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
                                     placeholder="500"
                                 />
                             </div>
@@ -309,15 +335,24 @@ const Expense = () => {
                                     value={formData.date}
                                     onChange={(e) => setFormData({ ...formData, date: e.target.value })}
                                     required
-                                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm sm:text-base"
+                                    disabled={submitting}
+                                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
                                 />
                             </div>
 
                             <button
                                 type="submit"
-                                className="w-full bg-red-600 text-white py-2.5 sm:py-3 rounded-lg font-semibold hover:bg-red-700 transition text-sm sm:text-base mt-4"
+                                disabled={submitting}
+                                className="w-full bg-red-600 text-white py-2.5 sm:py-3 rounded-lg font-semibold hover:bg-red-700 transition text-sm sm:text-base mt-4 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
                             >
-                                Add expense
+                                {submitting ? (
+                                    <>
+                                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                                        <span>Adding...</span>
+                                    </>
+                                ) : (
+                                    <span>Add expense</span>
+                                )}
                             </button>
                         </form>
                     </div>

@@ -13,6 +13,8 @@ const Income = () => {
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
+    const [deletingId, setDeletingId] = useState(null);
     const [formData, setFormData] = useState({
         name: '',
         icon: '💰',
@@ -48,6 +50,9 @@ const Income = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (submitting) return;
+
+        setSubmitting(true);
         try {
             await api.post('/incomes', {
                 ...formData,
@@ -65,22 +70,29 @@ const Income = () => {
             fetchIncomes();
         } catch (error) {
             toast.error('Income adding error');
+        } finally {
+            setSubmitting(false);
         }
     };
 
     const handleDelete = async (id) => {
-        if (confirm('Delete this income?')) {
-            try {
-                await api.delete(`/incomes/${id}`);
-                toast.success('Income deleted successfully');
-                fetchIncomes();
-            } catch (error) {
-                toast.error('Income deleting error');
-            }
+        if (deletingId) return;
+        if (!confirm('Delete this income?')) return;
+
+        setDeletingId(id);
+        try {
+            await api.delete(`/incomes/${id}`);
+            toast.success('Income deleted successfully');
+            fetchIncomes();
+        } catch (error) {
+            toast.error('Income deleting error');
+        } finally {
+            setDeletingId(null);
         }
     };
 
     const closeModal = () => {
+        if (submitting) return;
         setShowModal(false);
         setShowEmojiPicker(false);
         setFormData({
@@ -138,7 +150,8 @@ const Income = () => {
                     </div>
                     <button
                         onClick={() => setShowModal(true)}
-                        className="flex items-center justify-center space-x-2 bg-green-600 text-white px-4 sm:px-6 py-3 rounded-lg hover:bg-green-700 transition shadow-lg"
+                        disabled={submitting}
+                        className="flex items-center justify-center space-x-2 bg-green-600 text-white px-4 sm:px-6 py-3 rounded-lg hover:bg-green-700 transition shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <Plus size={20} />
                         <span>Add income</span>
@@ -208,9 +221,14 @@ const Income = () => {
                                             <td className="py-3 sm:py-4 px-2 sm:px-4 text-center">
                                                 <button
                                                     onClick={() => handleDelete(income.id)}
-                                                    className="text-red-600 hover:text-red-700 p-2 hover:bg-red-50 rounded-lg transition"
+                                                    disabled={deletingId === income.id}
+                                                    className="text-red-600 hover:text-red-700 p-2 hover:bg-red-50 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
                                                 >
-                                                    <Trash2 size={16} className="sm:w-[18px] sm:h-[18px]" />
+                                                    {deletingId === income.id ? (
+                                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600"></div>
+                                                    ) : (
+                                                        <Trash2 size={16} className="sm:w-[18px] sm:h-[18px]" />
+                                                    )}
                                                 </button>
                                             </td>
                                         </tr>
@@ -234,7 +252,8 @@ const Income = () => {
                             <h2 className="text-xl sm:text-2xl font-bold text-gray-800">Add income</h2>
                             <button
                                 onClick={closeModal}
-                                className="text-gray-400 hover:text-gray-600 p-1"
+                                disabled={submitting}
+                                className="text-gray-400 hover:text-gray-600 p-1 disabled:opacity-50"
                             >
                                 <X size={24} />
                             </button>
@@ -250,7 +269,8 @@ const Income = () => {
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                     required
-                                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm sm:text-base"
+                                    disabled={submitting}
+                                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
                                     placeholder="Salary"
                                 />
                             </div>
@@ -263,12 +283,13 @@ const Income = () => {
                                     <button
                                         type="button"
                                         onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                                        className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg text-left flex items-center space-x-2"
+                                        disabled={submitting}
+                                        className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg text-left flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         <span className="text-xl sm:text-2xl">{formData.icon}</span>
                                         <span className="text-gray-500 text-sm sm:text-base">Choose icon</span>
                                     </button>
-                                    {showEmojiPicker && (
+                                    {showEmojiPicker && !submitting && (
                                         <div className="absolute z-10 mt-2 left-0 right-0">
                                             <EmojiPicker
                                                 onEmojiClick={(emojiData) => {
@@ -290,7 +311,8 @@ const Income = () => {
                                     value={formData.categoryId}
                                     onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
                                     required
-                                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm sm:text-base"
+                                    disabled={submitting}
+                                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     <option value="">Choose category</option>
                                     {categories.map((cat) => (
@@ -311,7 +333,8 @@ const Income = () => {
                                     value={formData.amount}
                                     onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
                                     required
-                                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm sm:text-base"
+                                    disabled={submitting}
+                                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
                                     placeholder="1000"
                                 />
                             </div>
@@ -325,15 +348,24 @@ const Income = () => {
                                     value={formData.date}
                                     onChange={(e) => setFormData({ ...formData, date: e.target.value })}
                                     required
-                                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm sm:text-base"
+                                    disabled={submitting}
+                                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
                                 />
                             </div>
 
                             <button
                                 type="submit"
-                                className="w-full bg-green-600 text-white py-2.5 sm:py-3 rounded-lg font-semibold hover:bg-green-700 transition text-sm sm:text-base mt-4"
+                                disabled={submitting}
+                                className="w-full bg-green-600 text-white py-2.5 sm:py-3 rounded-lg font-semibold hover:bg-green-700 transition text-sm sm:text-base mt-4 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
                             >
-                                Add income
+                                {submitting ? (
+                                    <>
+                                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                                        <span>Adding...</span>
+                                    </>
+                                ) : (
+                                    <span>Add income</span>
+                                )}
                             </button>
                         </form>
                     </div>

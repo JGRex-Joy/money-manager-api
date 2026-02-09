@@ -14,6 +14,8 @@ const Category = () => {
     const [categoryToDelete, setCategoryToDelete] = useState(null);
     const [editMode, setEditMode] = useState(false);
     const [currentCategory, setCurrentCategory] = useState(null);
+    const [submitting, setSubmitting] = useState(false);
+    const [deleting, setDeleting] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
         icon: '📁',
@@ -37,6 +39,9 @@ const Category = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (submitting) return;
+
+        setSubmitting(true);
         try {
             if (editMode && currentCategory) {
                 await api.put(`/categories/${currentCategory.id}`, formData);
@@ -49,6 +54,8 @@ const Category = () => {
             fetchCategories();
         } catch (error) {
             toast.error(error.response?.data?.message || 'Category saving failed');
+        } finally {
+            setSubmitting(false);
         }
     };
 
@@ -58,8 +65,9 @@ const Category = () => {
     };
 
     const confirmDelete = async () => {
-        if (!categoryToDelete) return;
+        if (!categoryToDelete || deleting) return;
 
+        setDeleting(true);
         try {
             await api.delete(`/categories/${categoryToDelete.id}`);
             toast.success('Category and all related transactions deleted');
@@ -71,6 +79,8 @@ const Category = () => {
             toast.error(message);
             setShowDeleteWarning(false);
             setCategoryToDelete(null);
+        } finally {
+            setDeleting(false);
         }
     };
 
@@ -86,6 +96,7 @@ const Category = () => {
     };
 
     const closeModal = () => {
+        if (submitting) return;
         setShowModal(false);
         setEditMode(false);
         setCurrentCategory(null);
@@ -111,7 +122,8 @@ const Category = () => {
                     </div>
                     <button
                         onClick={() => setShowModal(true)}
-                        className="flex items-center justify-center space-x-2 bg-purple-600 text-white px-4 sm:px-6 py-3 rounded-lg hover:bg-purple-700 transition shadow-lg"
+                        disabled={submitting}
+                        className="flex items-center justify-center space-x-2 bg-purple-600 text-white px-4 sm:px-6 py-3 rounded-lg hover:bg-purple-700 transition shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <Plus size={20} />
                         <span>Create category</span>
@@ -145,13 +157,15 @@ const Category = () => {
                                         <div className="flex items-center space-x-1 sm:space-x-2 flex-shrink-0">
                                             <button
                                                 onClick={() => openEditModal(category)}
-                                                className="p-2 text-green-600 hover:bg-green-200 rounded-lg transition"
+                                                disabled={submitting}
+                                                className="p-2 text-green-600 hover:bg-green-200 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
                                             >
                                                 <Edit2 size={16} className="sm:w-[18px] sm:h-[18px]" />
                                             </button>
                                             <button
                                                 onClick={() => handleDeleteClick(category)}
-                                                className="p-2 text-red-600 hover:bg-red-200 rounded-lg transition"
+                                                disabled={deleting}
+                                                className="p-2 text-red-600 hover:bg-red-200 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
                                             >
                                                 <Trash2 size={16} className="sm:w-[18px] sm:h-[18px]" />
                                             </button>
@@ -192,13 +206,15 @@ const Category = () => {
                                         <div className="flex items-center space-x-1 sm:space-x-2 flex-shrink-0">
                                             <button
                                                 onClick={() => openEditModal(category)}
-                                                className="p-2 text-red-600 hover:bg-red-200 rounded-lg transition"
+                                                disabled={submitting}
+                                                className="p-2 text-red-600 hover:bg-red-200 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
                                             >
                                                 <Edit2 size={16} className="sm:w-[18px] sm:h-[18px]" />
                                             </button>
                                             <button
                                                 onClick={() => handleDeleteClick(category)}
-                                                className="p-2 text-red-600 hover:bg-red-200 rounded-lg transition"
+                                                disabled={deleting}
+                                                className="p-2 text-red-600 hover:bg-red-200 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
                                             >
                                                 <Trash2 size={16} className="sm:w-[18px] sm:h-[18px]" />
                                             </button>
@@ -250,18 +266,29 @@ const Category = () => {
                         <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 mt-4 sm:mt-6">
                             <button
                                 onClick={() => {
-                                    setShowDeleteWarning(false);
-                                    setCategoryToDelete(null);
+                                    if (!deleting) {
+                                        setShowDeleteWarning(false);
+                                        setCategoryToDelete(null);
+                                    }
                                 }}
-                                className="flex-1 bg-gray-200 text-gray-700 py-2.5 sm:py-3 rounded-lg font-semibold hover:bg-gray-300 transition text-sm sm:text-base"
+                                disabled={deleting}
+                                className="flex-1 bg-gray-200 text-gray-700 py-2.5 sm:py-3 rounded-lg font-semibold hover:bg-gray-300 transition text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={confirmDelete}
-                                className="flex-1 bg-red-600 text-white py-2.5 sm:py-3 rounded-lg font-semibold hover:bg-red-700 transition text-sm sm:text-base"
+                                disabled={deleting}
+                                className="flex-1 bg-red-600 text-white py-2.5 sm:py-3 rounded-lg font-semibold hover:bg-red-700 transition text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
                             >
-                                Yes, Delete Everything
+                                {deleting ? (
+                                    <>
+                                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                                        <span>Deleting...</span>
+                                    </>
+                                ) : (
+                                    <span>Yes, Delete Everything</span>
+                                )}
                             </button>
                         </div>
                     </div>
@@ -277,7 +304,8 @@ const Category = () => {
                             </h2>
                             <button
                                 onClick={closeModal}
-                                className="text-gray-400 hover:text-gray-600 p-1"
+                                disabled={submitting}
+                                className="text-gray-400 hover:text-gray-600 p-1 disabled:opacity-50"
                             >
                                 <X size={24} />
                             </button>
@@ -293,7 +321,8 @@ const Category = () => {
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                     required
-                                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm sm:text-base"
+                                    disabled={submitting}
+                                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
                                     placeholder="Category name"
                                 />
                             </div>
@@ -306,12 +335,13 @@ const Category = () => {
                                     <button
                                         type="button"
                                         onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                                        className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg text-left flex items-center space-x-2"
+                                        disabled={submitting}
+                                        className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg text-left flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         <span className="text-2xl sm:text-3xl">{formData.icon}</span>
                                         <span className="text-gray-500 text-sm sm:text-base">Choose icon</span>
                                     </button>
-                                    {showEmojiPicker && (
+                                    {showEmojiPicker && !submitting && (
                                         <div className="absolute z-10 mt-2 left-0 right-0">
                                             <EmojiPicker
                                                 onEmojiClick={(emojiData) => {
@@ -333,7 +363,8 @@ const Category = () => {
                                     <button
                                         type="button"
                                         onClick={() => setFormData({ ...formData, type: 'income' })}
-                                        className={`py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg font-medium transition text-sm sm:text-base ${
+                                        disabled={submitting}
+                                        className={`py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg font-medium transition text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed ${
                                             formData.type === 'income'
                                                 ? 'bg-green-600 text-white'
                                                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -344,7 +375,8 @@ const Category = () => {
                                     <button
                                         type="button"
                                         onClick={() => setFormData({ ...formData, type: 'expense' })}
-                                        className={`py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg font-medium transition text-sm sm:text-base ${
+                                        disabled={submitting}
+                                        className={`py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg font-medium transition text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed ${
                                             formData.type === 'expense'
                                                 ? 'bg-red-600 text-white'
                                                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -357,9 +389,17 @@ const Category = () => {
 
                             <button
                                 type="submit"
-                                className="w-full bg-purple-600 text-white py-2.5 sm:py-3 rounded-lg font-semibold hover:bg-purple-700 transition text-sm sm:text-base mt-4"
+                                disabled={submitting}
+                                className="w-full bg-purple-600 text-white py-2.5 sm:py-3 rounded-lg font-semibold hover:bg-purple-700 transition text-sm sm:text-base mt-4 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
                             >
-                                {editMode ? 'Update category' : 'Create category'}
+                                {submitting ? (
+                                    <>
+                                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                                        <span>{editMode ? 'Updating...' : 'Creating...'}</span>
+                                    </>
+                                ) : (
+                                    <span>{editMode ? 'Update category' : 'Create category'}</span>
+                                )}
                             </button>
                         </form>
                     </div>

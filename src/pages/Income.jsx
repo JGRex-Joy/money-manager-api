@@ -94,7 +94,6 @@ const Income = () => {
 
     const totalIncome = incomes.reduce((sum, income) => sum + Number(income.amount), 0);
 
-    // Prepare chart data
     const getChartData = () => {
         const sortedIncomes = [...incomes].sort((a, b) => new Date(a.date) - new Date(b.date));
 
@@ -146,13 +145,11 @@ const Income = () => {
                     </button>
                 </div>
 
-                {/* Total Income Card */}
                 <div className="bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl shadow-lg p-4 sm:p-6 text-white">
                     <p className="text-green-100 text-xs sm:text-sm font-medium">Total income this month</p>
                     <p className="text-3xl sm:text-4xl font-bold mt-2">{formatCurrency(totalIncome)}</p>
                 </div>
 
-                {/* Income Chart */}
                 {chartData.length > 0 && (
                     <div className="bg-white rounded-xl shadow-md border border-gray-100 p-4 sm:p-6">
                         <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-4">Income Trend</h2>
@@ -175,7 +172,6 @@ const Income = () => {
                     </div>
                 )}
 
-                {/* Incomes List */}
                 <div className="bg-white rounded-xl shadow-md border border-gray-100">
                     <div className="p-4 sm:p-6">
                         <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-4">Income list</h2>
@@ -231,7 +227,6 @@ const Income = () => {
                 </div>
             </div>
 
-            {/* Add Income Modal */}
             {showModal && (
                 <div className="fixed inset-0 bg-gradient-to-br from-green-900/20 via-emerald-900/20 to-teal-900/20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
                     <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-4 sm:p-6 max-h-[90vh] overflow-y-auto animate-scale-in">

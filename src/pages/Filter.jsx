@@ -80,7 +80,6 @@ const Filter = () => {
                             </div>
                         </div>
 
-                        {/* Date Range */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -112,7 +111,6 @@ const Filter = () => {
                             </div>
                         </div>
 
-                        {/* Keyword Search */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                                 Search by name
@@ -128,8 +126,6 @@ const Filter = () => {
                                 />
                             </div>
                         </div>
-
-                        {/* Sort Options */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -178,7 +174,6 @@ const Filter = () => {
                             </div>
                         </div>
 
-                        {/* Submit Button */}
                         <button
                             type="submit"
                             disabled={loading}
@@ -190,7 +185,6 @@ const Filter = () => {
                     </form>
                 </div>
 
-                {/* Results */}
                 {hasSearched && (
                     <div className="bg-white rounded-xl shadow-md border border-gray-100">
                         <div className="p-6">

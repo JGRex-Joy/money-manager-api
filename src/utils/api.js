@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1.0';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const api = axios.create({
     baseURL: API_BASE_URL,
@@ -9,7 +9,6 @@ const api = axios.create({
     },
 });
 
-// Interceptor для добавления токена к каждому запросу
 api.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem('token');
@@ -23,7 +22,6 @@ api.interceptors.request.use(
     }
 );
 
-// Interceptor для обработки ошибок
 api.interceptors.response.use(
     (response) => response,
     (error) => {

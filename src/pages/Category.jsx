@@ -103,7 +103,6 @@ const Category = () => {
     return (
         <Layout>
             <div className="space-y-6">
-                {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                     <div>
                         <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Categories</h1>
@@ -119,9 +118,7 @@ const Category = () => {
                     </button>
                 </div>
 
-                {/* Categories Grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-                    {/* Income Categories */}
                     <div className="bg-white rounded-xl shadow-md border border-gray-100 p-4 sm:p-6">
                         <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-4 flex items-center space-x-2">
                             <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
@@ -169,7 +166,6 @@ const Category = () => {
                         )}
                     </div>
 
-                    {/* Expense Categories */}
                     <div className="bg-white rounded-xl shadow-md border border-gray-100 p-4 sm:p-6">
                         <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-4 flex items-center space-x-2">
                             <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
@@ -219,7 +215,6 @@ const Category = () => {
                 </div>
             </div>
 
-            {/* Delete Warning Modal */}
             {showDeleteWarning && categoryToDelete && (
                 <div className="fixed inset-0 bg-gradient-to-br from-red-900/20 via-purple-900/20 to-blue-900/20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
                     <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-4 sm:p-6 animate-scale-in">
@@ -273,7 +268,6 @@ const Category = () => {
                 </div>
             )}
 
-            {/* Category Modal */}
             {showModal && (
                 <div className="fixed inset-0 bg-gradient-to-br from-purple-900/20 via-blue-900/20 to-pink-900/20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
                     <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-4 sm:p-6 max-h-[90vh] overflow-y-auto animate-scale-in">

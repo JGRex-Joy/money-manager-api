@@ -48,15 +48,14 @@ const Hero = () => {
     ];
 
     const stats = [
-        { value: '10K+', label: 'Active Users' },
-        { value: '$50M+', label: 'Managed Funds' },
+        { value: '1K', label: 'Active Users' },
+        { value: '50K+ KGS', label: 'Managed Funds' },
         { value: '99.9%', label: 'Uptime' },
         { value: '24/7', label: 'Support' }
     ];
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-            {/* Navigation */}
             <nav className="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center h-16">
@@ -86,7 +85,6 @@ const Hero = () => {
                 </div>
             </nav>
 
-            {/* Hero Section */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                     <div>
@@ -118,7 +116,6 @@ const Hero = () => {
                         </div>
                     </div>
 
-                    {/* Hero Image/Illustration */}
                     <div className="relative">
                         <div className="bg-gradient-to-br from-blue-100 to-purple-100 rounded-3xl p-8 shadow-2xl">
                             <div className="bg-white rounded-2xl p-6 shadow-lg">
@@ -132,21 +129,21 @@ const Hero = () => {
                                             <TrendingUp className="text-green-600" size={24} />
                                             <span className="font-semibold text-gray-700">Income</span>
                                         </div>
-                                        <span className="text-xl font-bold text-green-600">$12,450</span>
+                                        <span className="text-xl font-bold text-green-600">12,450 KGS</span>
                                     </div>
                                     <div className="flex items-center justify-between p-4 bg-red-50 rounded-xl">
                                         <div className="flex items-center space-x-3">
                                             <BarChart3 className="text-red-600" size={24} />
                                             <span className="font-semibold text-gray-700">Expenses</span>
                                         </div>
-                                        <span className="text-xl font-bold text-red-600">$8,230</span>
+                                        <span className="text-xl font-bold text-red-600">8,230 KGS</span>
                                     </div>
                                     <div className="flex items-center justify-between p-4 bg-blue-50 rounded-xl">
                                         <div className="flex items-center space-x-3">
                                             <Wallet className="text-blue-600" size={24} />
                                             <span className="font-semibold text-gray-700">Balance</span>
                                         </div>
-                                        <span className="text-xl font-bold text-blue-600">$4,220</span>
+                                        <span className="text-xl font-bold text-blue-600">4,220 KGS</span>
                                     </div>
                                 </div>
                             </div>
@@ -155,7 +152,6 @@ const Hero = () => {
                 </div>
             </div>
 
-            {/* Stats Section */}
             <div className="bg-gradient-to-r from-blue-600 to-purple-600 py-16">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
@@ -171,7 +167,6 @@ const Hero = () => {
                 </div>
             </div>
 
-            {/* Features Section */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
                 <div className="text-center mb-16">
                     <h2 className="text-4xl font-bold text-gray-900 mb-4">
@@ -203,7 +198,6 @@ const Hero = () => {
                 </div>
             </div>
 
-            {/* CTA Section */}
             <div className="bg-gradient-to-br from-blue-50 to-purple-50 py-20">
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                     <h2 className="text-4xl font-bold text-gray-900 mb-6">
@@ -236,7 +230,6 @@ const Hero = () => {
                 </div>
             </div>
 
-            {/* Footer */}
             <footer className="bg-gray-900 text-white py-12">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -277,7 +270,7 @@ const Hero = () => {
                         </div>
                     </div>
                     <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-                        <p>&copy; 2026 MoneyManager. All rights reserved.</p>
+                        <p>&copy; 2026. Money Manager. Amir Omurkulov</p>
                     </div>
                 </div>
             </footer>

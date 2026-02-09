@@ -5,8 +5,7 @@ import api from '../utils/api';
 import { formatCurrency, formatDate } from '../utils/formatters';
 import { toast } from '../components/Toaster';
 import { Wallet, TrendingUp, TrendingDown, Activity, DollarSign } from 'lucide-react';
-import {
-    AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, LineChart, Line,
+import { BarChart, Bar, PieChart, Pie, Cell, LineChart, Line,
     XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from 'recharts';
 

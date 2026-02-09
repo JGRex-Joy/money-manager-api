@@ -3,6 +3,7 @@ package in.amir.moneymanager.service;
 
 import in.amir.moneymanager.dto.CategoryDTO;
 import in.amir.moneymanager.entity.CategoryEntity;
+import in.amir.moneymanager.entity.IncomeEntity;
 import in.amir.moneymanager.entity.ProfileEntity;
 import in.amir.moneymanager.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
@@ -49,6 +50,16 @@ public class CategoryService {
         existingCategory.setIcon(categoryDTO.getIcon());
         categoryRepository.save(existingCategory);
         return toDTO(existingCategory);
+    }
+
+    public void deleteCategory(Long categoryId){
+        ProfileEntity profile = profileService.getCurrentProfile();
+        CategoryEntity entity = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+        if (!entity.getProfile().getId().equals(profile.getId())){
+            throw new RuntimeException("Unauthorized to delete this income");
+        }
+        categoryRepository.delete(entity);
     }
 
     private CategoryEntity toEntity(CategoryDTO categoryDTO, ProfileEntity profile) {

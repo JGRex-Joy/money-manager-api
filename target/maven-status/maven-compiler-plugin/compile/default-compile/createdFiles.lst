@@ -9,13 +9,11 @@ in\amir\moneymanager\service\IncomeService.class
 in\amir\moneymanager\controller\ExpenseController.class
 in\amir\moneymanager\service\ProfileService.class
 in\amir\moneymanager\service\ExpenseService.class
-in\amir\moneymanager\service\EmailService.class
 in\amir\moneymanager\entity\CategoryEntity$CategoryEntityBuilder.class
 in\amir\moneymanager\config\SecurityConfig.class
 in\amir\moneymanager\controller\CategoryController.class
 in\amir\moneymanager\dto\ProfileDTO.class
 in\amir\moneymanager\dto\CategoryDTO.class
-in\amir\moneymanager\service\NotificationService.class
 in\amir\moneymanager\dto\RecentTransactionDTO.class
 in\amir\moneymanager\entity\ExpenseEntity.class
 in\amir\moneymanager\dto\ProfileDTO$ProfileDTOBuilder.class

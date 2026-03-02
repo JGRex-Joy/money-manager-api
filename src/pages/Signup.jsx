@@ -43,8 +43,8 @@ const Signup = () => {
                 password: formData.password,
             });
 
-            toast.success('Registration successful! Check your email to activate your account');
-            setTimeout(() => navigate('/login'), 2000);
+            toast.success('Registration successful!');
+            setTimeout(() => navigate('/login'), 1500);
         } catch (error) {
             const errorMessage = error.response?.data?.message || 'Registration error. Please try again';
             toast.error(errorMessage);

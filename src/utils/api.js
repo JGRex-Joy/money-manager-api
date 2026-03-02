@@ -12,7 +12,7 @@ const api = axios.create({
 api.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem('token');
-        const publicEndpoints = ['/register', '/login', '/activate'];
+        const publicEndpoints = ['/register', '/login'];
 
         const isPublic = publicEndpoints.some(endpoint => config.url.endsWith(endpoint));
 

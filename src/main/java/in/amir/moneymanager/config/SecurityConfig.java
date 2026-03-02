@@ -52,7 +52,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of(
-                "https://money-manager-api-flax.vercel.app",
+                "https://*.vercel.app",
                 "http://localhost:3000",
                 "http://localhost:5173"
         ));
